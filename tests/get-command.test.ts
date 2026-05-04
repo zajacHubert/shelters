@@ -374,6 +374,54 @@ describe("10x get — --lang flag", () => {
     expect(data.languageFallback).toBe(false);
   });
 
+  it("passes ?tool=cursor to fetchLesson when --tool cursor is set (install flow)", async () => {
+    writeValidAuth();
+    let capturedTool: string | undefined;
+    apiContentMockState.fetchLessonImpl = (_course, _lessonId, _token, options) => {
+      capturedTool = options?.tool;
+      return lessonOk(makeBundle());
+    };
+
+    const { exitCode } = await runGet(["get", "m1l1", "--tool", "cursor", "--json"]);
+    expect(exitCode ?? 0).toBe(0);
+    expect(capturedTool).toBe("cursor");
+  });
+
+  it("passes ?tool=cursor to fetchLesson in print/filter flow (--print --type rules)", async () => {
+    writeValidAuth();
+    let capturedTool: string | undefined;
+    apiContentMockState.fetchLessonImpl = (_course, _lessonId, _token, options) => {
+      capturedTool = options?.tool;
+      return lessonOk(makeBundle());
+    };
+
+    const { exitCode } = await runGet([
+      "get",
+      "m1l1",
+      "--tool",
+      "cursor",
+      "--print",
+      "--type",
+      "rules",
+      "--json",
+    ]);
+    expect(exitCode ?? 0).toBe(0);
+    expect(capturedTool).toBe("cursor");
+  });
+
+  it("defaults to tool=claude-code when no --tool flag", async () => {
+    writeValidAuth();
+    let capturedTool: string | undefined;
+    apiContentMockState.fetchLessonImpl = (_course, _lessonId, _token, options) => {
+      capturedTool = options?.tool;
+      return lessonOk(makeBundle());
+    };
+
+    const { exitCode } = await runGet(["get", "m1l1", "--json"]);
+    expect(exitCode ?? 0).toBe(0);
+    expect(capturedTool).toBe("claude-code");
+  });
+
   it("shows fallback info in verbose output when X-Content-Fallback is true", async () => {
     writeValidAuth();
     apiContentMockState.fetchLessonImpl = () => {

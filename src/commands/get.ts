@@ -119,7 +119,10 @@ export async function runGet(
   }
 
   verbose(ctx, `fetching lesson ${course}/${parsed.lessonId}`);
-  const result = await fetchLesson(course, parsed.lessonId, auth.access_token, { lang });
+  const result = await fetchLesson(course, parsed.lessonId, auth.access_token, {
+    lang,
+    tool: profile.toolId,
+  });
 
   if (!result.ok) {
     handleLessonError(ctx, result.status, result.code, result.error, result.payload);
@@ -276,7 +279,7 @@ async function runPrintMode(
   } else {
     // Fetch full bundle, filter by type, concatenate
     verbose(ctx, `fetching lesson ${course}/${lessonId} (filtering by ${options.type})`);
-    const result = await fetchLesson(course, lessonId, token, { lang });
+    const result = await fetchLesson(course, lessonId, token, { lang, tool: profile.toolId });
 
     if (!result.ok) {
       handleLessonError(ctx, result.status, result.code, result.error, result.payload);

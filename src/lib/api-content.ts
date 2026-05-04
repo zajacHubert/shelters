@@ -139,10 +139,11 @@ export async function fetchLesson(
   course: string,
   lessonId: string,
   token: string,
-  options: { signal?: AbortSignal; lang?: string } = {},
+  options: { signal?: AbortSignal; lang?: string; tool?: string } = {},
 ): Promise<ApiResult<LessonBundle>> {
   const params = new URLSearchParams();
   if (options.lang) params.set("lang", options.lang);
+  if (options.tool) params.set("tool", options.tool);
   const qs = params.toString();
   const path = `/api/lessons/${encodeURIComponent(course)}/${encodeURIComponent(lessonId)}${qs ? `?${qs}` : ""}`;
   const result = await apiGet<LessonBundle>(path, { token, signal: options.signal });

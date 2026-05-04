@@ -53,7 +53,7 @@ export interface ApiContentMockState {
         course: string,
         lessonId: string,
         token: string,
-        options?: { lang?: string },
+        options?: { lang?: string; tool?: string },
       ) => Promise<ApiResult<LessonBundle>> | ApiResult<LessonBundle>);
   fetchArtifactImpl:
     | null
@@ -102,7 +102,7 @@ mock.module("../../src/lib/api-content", () => ({
     course: string,
     lessonId: string,
     token: string,
-    options?: { signal?: AbortSignal; lang?: string },
+    options?: { signal?: AbortSignal; lang?: string; tool?: string },
   ) =>
     apiContentMockState.fetchLessonImpl
       ? Promise.resolve(apiContentMockState.fetchLessonImpl(course, lessonId, token, options))
