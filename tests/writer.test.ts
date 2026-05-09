@@ -309,13 +309,13 @@ describe("writer — multi-file skills", () => {
     ).toBe("# format reference\n");
   });
 
-  it("applies +x to files marked executable", () => {
+  it.skipIf(process.platform === "win32")("applies +x to files marked executable", () => {
     applyBundle(multiFileBundle(), tmp);
     const mode = statSync(join(tmp, ".claude/skills/10x-plan/scripts/check-context.sh")).mode;
     expect((mode & 0o111) !== 0).toBe(true);
   });
 
-  it("non-executable files are not chmod-marked +x", () => {
+  it.skipIf(process.platform === "win32")("non-executable files are not chmod-marked +x", () => {
     applyBundle(multiFileBundle(), tmp);
     const mode = statSync(join(tmp, ".claude/skills/10x-plan/SKILL.md")).mode;
     expect((mode & 0o111) === 0).toBe(true);

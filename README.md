@@ -3,10 +3,18 @@
 CLI tool for [10xDevs](https://10xdevs.pl) course content. Fetch and apply AI coding skills,
 prompts, and configs directly into your workspace.
 
+## Requirements
+
+- **Node 20+** — this is the only runtime dependency.
+
 ## Install
 
 ```bash
-# npm (recommended)
+# Zero-install — run directly with npx (no global install needed)
+npx @przeprogramowani/10x-cli auth
+npx @przeprogramowani/10x-cli get m1l1
+
+# Or install globally for shorter commands
 npm install -g @przeprogramowani/10x-cli
 
 # Or download a standalone binary from GitHub Releases

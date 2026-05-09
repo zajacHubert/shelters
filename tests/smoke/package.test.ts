@@ -6,16 +6,18 @@
  */
 import { describe, it, expect } from "bun:test";
 import { execSync } from "node:child_process";
-import { readFileSync } from "node:fs";
-import { resolve } from "node:path";
+import { readFileSync, mkdtempSync, rmSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { join, resolve } from "node:path";
 
 const ROOT = resolve(import.meta.dir, "../..");
 
 describe("npm pack contents", () => {
   it("includes required files and excludes dev artifacts", () => {
-    const output = execSync("npm pack --dry-run --json 2>/dev/null", {
+    const output = execSync("npm pack --dry-run --json", {
       cwd: ROOT,
       encoding: "utf8",
+      stdio: ["pipe", "pipe", "pipe"],
     });
     const [pack] = JSON.parse(output);
     const filePaths = pack.files.map(
@@ -61,7 +63,7 @@ describe("auto-version script", () => {
     exitCode: number;
     packageJson: string;
   } {
-    const tmpDir = execSync("mktemp -d", { encoding: "utf8" }).trim();
+    const tmpDir = mkdtempSync(join(tmpdir(), "10x-autoversion-"));
 
     try {
       // Initialize repo with a v1.0.0 tag, then add commits that touch
@@ -87,11 +89,14 @@ describe("auto-version script", () => {
         { cwd: tmpDir, stdio: "pipe" },
       );
 
+      const homeEnv = process.platform === "win32"
+        ? { USERPROFILE: tmpDir }
+        : { HOME: tmpDir };
       const proc = Bun.spawnSync(["bun", "auto-version.mjs"], {
         cwd: tmpDir,
         stdout: "pipe",
         stderr: "pipe",
-        env: { ...process.env, HOME: "/tmp", NODE_PATH: `${ROOT}/node_modules` },
+        env: { ...process.env, ...homeEnv, NODE_PATH: `${ROOT}/node_modules` },
       });
 
       const pkgContent = (() => {
@@ -109,7 +114,7 @@ describe("auto-version script", () => {
         packageJson: pkgContent,
       };
     } finally {
-      execSync(`rm -rf "${tmpDir}"`, { stdio: "pipe" });
+      rmSync(tmpDir, { recursive: true, force: true });
     }
   }
 

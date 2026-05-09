@@ -8,9 +8,11 @@
  */
 import { describe, it, expect, beforeAll } from "bun:test";
 import { existsSync } from "node:fs";
+import { tmpdir } from "node:os";
 import { resolve } from "node:path";
 
-const BINARY_PATH = resolve(import.meta.dir, "../../dist/10x");
+const BINARY_NAME = process.platform === "win32" ? "10x.exe" : "10x";
+const BINARY_PATH = resolve(import.meta.dir, "../../dist", BINARY_NAME);
 
 const binaryExists = existsSync(BINARY_PATH);
 
@@ -55,12 +57,15 @@ describe("compiled binary", () => {
 
   it("bundles dependencies — runs without node_modules", async () => {
     if (!binaryExists) return;
-    // Run from /tmp where there are no node_modules
+    const isolatedDir = tmpdir();
+    const homeEnv = process.platform === "win32"
+      ? { USERPROFILE: isolatedDir }
+      : { HOME: isolatedDir };
     const proc = Bun.spawnSync([BINARY_PATH, "--version"], {
       stdout: "pipe",
       stderr: "pipe",
-      cwd: "/tmp",
-      env: { HOME: "/tmp", NO_COLOR: "1" },
+      cwd: isolatedDir,
+      env: { ...homeEnv, NO_COLOR: "1" },
     });
     expect(proc.exitCode).toBe(0);
   });
