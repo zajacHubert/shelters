@@ -251,10 +251,10 @@ describe("10x get — happy path", () => {
     expect(data.counts).toEqual({ skills: 1, prompts: 1, rules: 1, configs: 1 });
     expect(data.writes.skills[0]!.name).toBe("code-review");
     expect(data.writes.skills[0]!.files[0]!.absolutePath).toContain(
-      ".claude/skills/code-review/SKILL.md",
+      join(".claude", "skills", "code-review", "SKILL.md"),
     );
-    expect(data.writes.prompts[0]!.path).toContain(".claude/prompts/plan.md");
-    expect(data.writes.configs[0]!.path).toContain(".claude/config-templates/settings.json");
+    expect(data.writes.prompts[0]!.path).toContain(join(".claude", "prompts", "plan.md"));
+    expect(data.writes.configs[0]!.path).toContain(join(".claude", "config-templates", "settings.json"));
     expect(data.dry_run).toBe(false);
   });
 

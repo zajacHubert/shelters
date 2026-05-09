@@ -1,4 +1,5 @@
 import { describe, expect, it } from "bun:test";
+import { join } from "node:path";
 import { ExitCodes, resolveContext } from "../src/lib/output";
 import { authFilePath, configDir } from "../src/lib/config";
 import { DEFAULT_API_BASE, resolveApiBase } from "../src/lib/api-client";
@@ -27,7 +28,7 @@ describe("config paths", () => {
   it("resolves a config directory under the user home", () => {
     const dir = configDir();
     expect(dir).toContain("10x-cli");
-    expect(authFilePath()).toBe(`${dir}/auth.json`);
+    expect(authFilePath()).toBe(join(dir, "auth.json"));
   });
 });
 
