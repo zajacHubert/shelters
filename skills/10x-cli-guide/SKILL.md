@@ -1,6 +1,6 @@
 ---
 name: 10x-cli-guide
-description: Invoke this skill when the user asks how to USE the 10x-cli day-to-day — fetching lessons, listing modules, switching AI tools, troubleshooting errors, understanding where artifacts land, or working on a specific OS (Windows, Linux, macOS). Covers commands (get, list, doctor, auth --status/--logout), tool profiles, artifact locations, common errors, and platform-specific tips. Excludes: first-time installation and onboarding (use 10x-cli-setup instead), developing or contributing to 10x-cli source code, and general programming help.
+description: "Invoke this skill when the user asks how to USE the 10x-cli day-to-day — fetching lessons, listing modules, switching AI tools, troubleshooting errors, understanding where artifacts land, or working on a specific OS (Windows, Linux, macOS). Covers commands (get, list, doctor, auth --status/--logout), tool profiles, artifact locations, common errors, and platform-specific tips. Excludes: first-time installation and onboarding (use 10x-cli-setup instead), developing or contributing to 10x-cli source code, and general programming help."
 ---
 
 # 10x-cli Daily Usage Guide
