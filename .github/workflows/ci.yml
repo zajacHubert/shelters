@@ -62,7 +62,7 @@ jobs:
         run: bun install --frozen-lockfile
 
       - name: Test (unit + integration, excludes smoke)
-        run: bun test tests/*.test.ts
+        run: bun test ./tests/*.test.ts
 
   # ── Release jobs (master push only) ──────────────────────────────
 
