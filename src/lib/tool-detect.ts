@@ -92,6 +92,19 @@ export function detectTools(projectRoot: string): DetectionSignal[] {
     signals.push({ profileId: "codex", confidence: "medium", reason: "AGENTS.md" });
   }
 
+  // Windsurf
+  if (hit(".windsurf/" + MANIFEST_FILENAME)) {
+    signals.push({
+      profileId: "windsurf",
+      confidence: "strong",
+      reason: ".windsurf/.10x-cli-manifest.json",
+    });
+  } else if (hit(".windsurfrules")) {
+    signals.push({ profileId: "windsurf", confidence: "strong", reason: ".windsurfrules" });
+  } else if (hit(".windsurf")) {
+    signals.push({ profileId: "windsurf", confidence: "medium", reason: ".windsurf/ directory" });
+  }
+
   // Generic — .ai/ is a project-defined convention
   if (hit(".ai/" + MANIFEST_FILENAME)) {
     signals.push({
@@ -109,7 +122,7 @@ export function detectTools(projectRoot: string): DetectionSignal[] {
 }
 
 const CONFIDENCE_ORDER: Record<Confidence, number> = { strong: 3, medium: 2, weak: 1 };
-const PROFILE_ORDER = ["claude-code", "cursor", "copilot", "codex", "generic"];
+const PROFILE_ORDER = ["claude-code", "cursor", "copilot", "codex", "windsurf", "generic"];
 
 function rankSignals(signals: DetectionSignal[]): DetectionSignal[] {
   return [...signals].sort((a, b) => {

@@ -17,7 +17,7 @@ import { mkdirSync, mkdtempSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import cac from "cac";
-import { AUTH_FILE_VERSION, type AuthData, saveAuth } from "../src/lib/config";
+import { AUTH_FILE_VERSION, type AuthData, saveAuth, saveToolConfig } from "../src/lib/config";
 import {
   apiContentMockState,
   resetApiContentMock,
@@ -182,7 +182,7 @@ describe("10x doctor — all checks pass", () => {
     expect(report.failed).toBe(0);
     expect(report.passed).toBeGreaterThanOrEqual(4);
     const names = report.checks.map((c) => c.name).sort();
-    expect(names).toEqual(["api", "auth", "claude", "config", "version"]);
+    expect(names).toEqual(["api", "auth", "config", "tool-dir", "version"]);
   });
 });
 
@@ -262,19 +262,49 @@ describe("10x doctor — API unreachable", () => {
   });
 });
 
-describe("10x doctor — .claude/ missing", () => {
-  it("exits 78 when .claude/ is absent from cwd", async () => {
+describe("10x doctor — tool directory missing", () => {
+  it("exits 78 when tool directory is absent from cwd", async () => {
     writeValidAuth();
     healthyApi();
-    // Move up one directory so .claude/ is out of reach.
     rmSync(join(tmpProject, ".claude"), { recursive: true, force: true });
 
     const { stdout, exitCode } = await runDoctor(["doctor", "--json"]);
     expect(exitCode).toBe(78);
     const report = parseDoctor(stdout);
-    const claude = report.checks.find((c) => c.name === "claude");
-    expect(claude?.status).toBe("fail");
-    expect(claude?.message).toContain(".claude/");
+    const toolDir = report.checks.find((c) => c.name === "tool-dir");
+    expect(toolDir?.status).toBe("fail");
+    expect(toolDir?.message).toContain(".claude/");
+  });
+});
+
+describe("10x doctor — tool-profile-aware directory check", () => {
+  it("checks .cursor/ when tool is configured as cursor", async () => {
+    writeValidAuth();
+    healthyApi();
+    saveToolConfig({ tool: "cursor" });
+    rmSync(join(tmpProject, ".claude"), { recursive: true, force: true });
+    mkdirSync(join(tmpProject, ".cursor"), { recursive: true });
+
+    const { stdout, exitCode } = await runDoctor(["doctor", "--json"]);
+    expect(exitCode ?? 0).toBe(0);
+    const report = parseDoctor(stdout);
+    const toolDir = report.checks.find((c) => c.name === "tool-dir");
+    expect(toolDir?.status).toBe("pass");
+    expect(toolDir?.message).toContain(".cursor");
+  });
+
+  it("fails when configured tool directory is missing", async () => {
+    writeValidAuth();
+    healthyApi();
+    saveToolConfig({ tool: "windsurf" });
+    rmSync(join(tmpProject, ".claude"), { recursive: true, force: true });
+
+    const { stdout, exitCode } = await runDoctor(["doctor", "--json"]);
+    expect(exitCode).toBe(78);
+    const report = parseDoctor(stdout);
+    const toolDir = report.checks.find((c) => c.name === "tool-dir");
+    expect(toolDir?.status).toBe("fail");
+    expect(toolDir?.message).toContain(".windsurf/");
   });
 });
 

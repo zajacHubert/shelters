@@ -127,6 +127,30 @@ describe("detectTools", () => {
     expect(signals[0]!.profileId).toBe("claude-code");
     expect(signals[0]!.confidence).toBe("weak");
   });
+
+  it(".windsurfrules → windsurf (strong)", () => {
+    touchFile(".windsurfrules", "# rules\n");
+    const signals = detectTools(tmp);
+    expect(signals).toHaveLength(1);
+    expect(signals[0]!.profileId).toBe("windsurf");
+    expect(signals[0]!.confidence).toBe("strong");
+  });
+
+  it(".windsurf/ directory only → windsurf (medium)", () => {
+    touchDir(".windsurf");
+    const signals = detectTools(tmp);
+    expect(signals).toHaveLength(1);
+    expect(signals[0]!.profileId).toBe("windsurf");
+    expect(signals[0]!.confidence).toBe("medium");
+  });
+
+  it(".windsurf manifest → windsurf (strong)", () => {
+    writeManifestAt(".windsurf");
+    const signals = detectTools(tmp);
+    expect(signals).toHaveLength(1);
+    expect(signals[0]!.profileId).toBe("windsurf");
+    expect(signals[0]!.confidence).toBe("strong");
+  });
 });
 
 describe("topDetectedProfile", () => {

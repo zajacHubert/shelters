@@ -72,6 +72,18 @@ export const PROFILES: Record<string, ToolProfile> = {
     sentinelBegin: SENTINEL_BEGIN,
     sentinelEnd: SENTINEL_END,
   },
+  windsurf: {
+    toolId: "windsurf",
+    displayName: "Windsurf",
+    skillPath: (n) => `.windsurf/skills/${n}/SKILL.md`,
+    skillDir: (n) => `.windsurf/skills/${n}`,
+    promptPath: (n) => `.windsurf/prompts/${n}.md`,
+    configPath: (n) => `.windsurf/config-templates/${n}`,
+    rulesFile: ".windsurfrules",
+    manifestDir: ".windsurf",
+    sentinelBegin: SENTINEL_BEGIN,
+    sentinelEnd: SENTINEL_END,
+  },
   generic: {
     toolId: "generic",
     displayName: "Other / Generic",

@@ -4,8 +4,9 @@ import { join } from "node:path";
 import packageJson from "../../package.json" with { type: "json" };
 import { apiBaseUrl, fetchHealth } from "../lib/api-content";
 import { isExpired, isNearExpiry } from "../lib/auth-guard";
-import { configDir, readAuth } from "../lib/config";
+import { configDir, readAuth, readToolConfig } from "../lib/config";
 import { formatReleaseAt } from "../lib/format";
+import { PROFILES, DEFAULT_TOOL } from "../lib/tool-profile";
 import {
   type GlobalFlags,
   type OutputContext,
@@ -33,7 +34,7 @@ const EX_CONFIG = 78;
 
 export function registerDoctorCommand(cli: CAC): void {
   cli
-    .command("doctor", "Diagnose auth, API, config, and .claude/ state")
+    .command("doctor", "Diagnose auth, API, config, and tool directory state")
     .action(async (options: GlobalFlags) => {
       const ctx = resolveContext(options);
       await runDoctor(ctx);
@@ -47,7 +48,7 @@ export async function runDoctor(ctx: OutputContext): Promise<void> {
   checks.push(await checkApiConnectivity());
   checks.push(checkConfigDirectory());
   checks.push(checkCliVersion());
-  checks.push(checkClaudeDirectory());
+  checks.push(checkToolDirectory());
 
   const failed = checks.filter((c) => c.status === "fail").length;
   const passed = checks.filter((c) => c.status === "pass").length;
@@ -220,36 +221,40 @@ function checkCliVersion(): CheckResult {
   };
 }
 
-function checkClaudeDirectory(): CheckResult {
+function checkToolDirectory(): CheckResult {
   const cwd = process.cwd();
-  const claudeDir = join(cwd, ".claude");
-  if (!existsSync(claudeDir)) {
+  const toolId = readToolConfig()?.tool ?? DEFAULT_TOOL;
+  const profile = PROFILES[toolId] ?? PROFILES[DEFAULT_TOOL]!;
+  const dirName = profile.manifestDir;
+  const toolDir = join(cwd, dirName);
+
+  if (!existsSync(toolDir)) {
     return {
-      name: "claude",
-      label: "Claude",
+      name: "tool-dir",
+      label: profile.displayName,
       status: "fail",
-      message: `.claude/ was not found in ${cwd}.`,
-      hint: "Run '10x doctor' from a project directory that already has a .claude/ folder.",
-      details: { path: claudeDir, exists: false },
+      message: `${dirName}/ was not found in ${cwd}.`,
+      hint: `Run '10x doctor' from a project directory that already has a ${dirName}/ folder.`,
+      details: { path: toolDir, exists: false, tool: toolId },
     };
   }
   try {
-    accessSync(claudeDir, constants.W_OK);
+    accessSync(toolDir, constants.W_OK);
     return {
-      name: "claude",
-      label: "Claude",
+      name: "tool-dir",
+      label: profile.displayName,
       status: "pass",
-      message: `${claudeDir} is writable.`,
-      details: { path: claudeDir, exists: true },
+      message: `${toolDir} is writable.`,
+      details: { path: toolDir, exists: true, tool: toolId },
     };
   } catch (err) {
     return {
-      name: "claude",
-      label: "Claude",
+      name: "tool-dir",
+      label: profile.displayName,
       status: "fail",
-      message: `${claudeDir} is not writable.`,
+      message: `${toolDir} is not writable.`,
       hint: `Fix directory permissions, then run '10x doctor' again. (${err instanceof Error ? err.message : String(err)})`,
-      details: { path: claudeDir, exists: true },
+      details: { path: toolDir, exists: true, tool: toolId },
     };
   }
 }
