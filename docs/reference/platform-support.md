@@ -31,7 +31,16 @@ npx @przeprogramowani/10x-cli get m1l1
 
 ## Clipboard
 
-Skills that copy output to the clipboard work automatically on all platforms. If the clipboard tool is not available (e.g., no `xclip` on a headless Linux server), the copy fails silently — no error is shown.
+Skills that copy output to the clipboard work automatically on all platforms. Each skill provides both bash and PowerShell clipboard commands so your AI agent can pick the right one for your shell.
+
+| Shell | Clipboard command |
+|-------|-------------------|
+| bash / zsh (macOS) | `pbcopy` |
+| bash / zsh (Linux) | `xclip -selection clipboard` |
+| bash / PowerShell (Windows) | `clip.exe` |
+| PowerShell (native) | `Set-Clipboard` |
+
+If no clipboard tool is available (e.g., headless Linux server), the copy fails silently — no error is shown.
 
 To install clipboard support on Linux:
 
@@ -64,4 +73,11 @@ The CLI auto-detects your tool from project markers on first run. Override anyti
 
 ## CI testing
 
-The CLI test suite runs on both Ubuntu and Windows in CI, catching platform regressions before release.
+The CLI is tested on both Ubuntu and Windows in CI:
+
+| Test level | Ubuntu | Windows |
+|------------|--------|---------|
+| Unit + integration (343 tests) | `check` job | `check-windows` job (PowerShell) |
+| End-to-end (CLI ↔ API) | `e2e-cli` job | `e2e-cli-windows` job |
+
+The Windows e2e job builds the CLI from source, links the `10x` binary, spins up a local API with wrangler, and runs the full test suite including `list`, `get`, `get --tool codex`, `doctor`, signature verification, and module gating.
