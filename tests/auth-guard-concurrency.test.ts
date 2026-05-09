@@ -13,6 +13,7 @@ import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import lockfile from "proper-lockfile";
 import { AUTH_FILE_VERSION, type AuthData, authFilePath, saveAuth } from "../src/lib/config";
+import { redirectConfigDir, restoreConfigDir } from "./helpers/config-isolation";
 import { requireAuth } from "../src/lib/auth-guard";
 import type { ApiResult } from "../src/lib/api-client";
 import type { TokenBundle } from "../src/lib/auth-flow";
@@ -22,7 +23,7 @@ const ctx: OutputContext = { json: true, verbose: false };
 const here = dirname(fileURLToPath(import.meta.url));
 
 let tmp: string;
-let priorXdg: string | undefined;
+
 
 function captureExit<T>(
   fn: () => Promise<T>,
@@ -65,8 +66,7 @@ function captureExit<T>(
 
 beforeEach(() => {
   tmp = mkdtempSync(join(tmpdir(), "10x-cli-conc-"));
-  priorXdg = process.env["XDG_CONFIG_HOME"];
-  process.env["XDG_CONFIG_HOME"] = tmp;
+  redirectConfigDir(tmp);
   mkdirSync(join(tmp, "10x-cli"), { recursive: true });
 });
 
@@ -77,8 +77,7 @@ afterEach(async () => {
   } catch {
     // not locked — ignore
   }
-  if (priorXdg === undefined) delete process.env["XDG_CONFIG_HOME"];
-  else process.env["XDG_CONFIG_HOME"] = priorXdg;
+  restoreConfigDir();
   rmSync(tmp, { recursive: true, force: true });
 });
 
@@ -149,6 +148,7 @@ describe("requireAuth concurrency (file lock)", () => {
     const baseEnv: NodeJS.ProcessEnv = {
       ...process.env,
       XDG_CONFIG_HOME: tmp,
+      APPDATA: tmp,
       RACE_COUNTER: counterFile,
       RACE_NEW_TOKEN: "jwt-rotated",
       RACE_NEW_REFRESH: "rt-rotated",

@@ -10,19 +10,17 @@ import {
   isAuthenticated,
   saveAuth,
 } from "../src/lib/config";
+import { redirectConfigDir, restoreConfigDir } from "./helpers/config-isolation";
 
 let tmp: string;
-let priorXdg: string | undefined;
 
 beforeEach(() => {
   tmp = mkdtempSync(join(tmpdir(), "10x-cli-auth-cmd-"));
-  priorXdg = process.env["XDG_CONFIG_HOME"];
-  process.env["XDG_CONFIG_HOME"] = tmp;
+  redirectConfigDir(tmp);
 });
 
 afterEach(() => {
-  if (priorXdg === undefined) delete process.env["XDG_CONFIG_HOME"];
-  else process.env["XDG_CONFIG_HOME"] = priorXdg;
+  restoreConfigDir();
   rmSync(tmp, { recursive: true, force: true });
 });
 

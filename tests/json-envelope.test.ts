@@ -26,6 +26,7 @@ import {
 } from "../src/lib/config";
 import { authFlowMockState, resetAuthFlowMock } from "./helpers/auth-flow-mock";
 import { resetClackMock } from "./helpers/clack-mock";
+import { redirectConfigDir, restoreConfigDir } from "./helpers/config-isolation";
 
 // ---------------------------------------------------------------------------
 // Stream capture: stdout and stderr separately, plus process.exit
@@ -162,7 +163,6 @@ function assertNoLeakage(stdout: string, options: LeakageOptions = {}): void {
 // ---------------------------------------------------------------------------
 
 let tmp: string;
-let priorXdg: string | undefined;
 let priorIsTTY: boolean | undefined;
 
 const TEST_EMAIL = "envelope-test@example.com";
@@ -170,8 +170,7 @@ const FORBIDDEN_EMAIL = "leak-canary@example.com";
 
 beforeEach(() => {
   tmp = mkdtempSync(join(tmpdir(), "10x-cli-env-"));
-  priorXdg = process.env["XDG_CONFIG_HOME"];
-  process.env["XDG_CONFIG_HOME"] = tmp;
+  redirectConfigDir(tmp);
   priorIsTTY = process.stdout.isTTY;
   // Force JSON mode by simulating piped stdout.
   process.stdout.isTTY = false;
@@ -180,8 +179,7 @@ beforeEach(() => {
 });
 
 afterEach(() => {
-  if (priorXdg === undefined) delete process.env["XDG_CONFIG_HOME"];
-  else process.env["XDG_CONFIG_HOME"] = priorXdg;
+  restoreConfigDir();
   if (priorIsTTY === undefined) delete (process.stdout as { isTTY?: boolean }).isTTY;
   else process.stdout.isTTY = priorIsTTY;
   // Leave shared mock state pristine for any test file that runs after us.

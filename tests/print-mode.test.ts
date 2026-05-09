@@ -17,6 +17,7 @@ import {
   apiContentMockState,
   resetApiContentMock,
 } from "./helpers/api-content-mock";
+import { redirectConfigDir, restoreConfigDir } from "./helpers/config-isolation";
 
 interface CaptureResult {
   stdout: string;
@@ -81,7 +82,6 @@ async function runGet(argv: string[]): Promise<CaptureResult> {
 
 let tmp: string;
 let projectRoot: string;
-let priorXdg: string | undefined;
 let priorIsTTY: boolean | undefined;
 let priorCwd: string;
 
@@ -89,8 +89,7 @@ beforeEach(() => {
   tmp = mkdtempSync(join(tmpdir(), "10x-cli-print-"));
   projectRoot = join(tmp, "project");
   mkdirSync(projectRoot, { recursive: true });
-  priorXdg = process.env["XDG_CONFIG_HOME"];
-  process.env["XDG_CONFIG_HOME"] = tmp;
+  redirectConfigDir(tmp);
   priorIsTTY = process.stdout.isTTY;
   process.stdout.isTTY = false; // force JSON mode
   priorCwd = process.cwd();
@@ -100,8 +99,7 @@ beforeEach(() => {
 
 afterEach(() => {
   process.chdir(priorCwd);
-  if (priorXdg === undefined) delete process.env["XDG_CONFIG_HOME"];
-  else process.env["XDG_CONFIG_HOME"] = priorXdg;
+  restoreConfigDir();
   if (priorIsTTY === undefined) delete (process.stdout as { isTTY?: boolean }).isTTY;
   else process.stdout.isTTY = priorIsTTY;
   resetApiContentMock();

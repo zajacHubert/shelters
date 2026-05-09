@@ -21,6 +21,7 @@ import {
   apiContentMockState,
   resetApiContentMock,
 } from "./helpers/api-content-mock";
+import { redirectConfigDir, restoreConfigDir } from "./helpers/config-isolation";
 
 interface CaptureResult {
   stdout: string;
@@ -88,21 +89,18 @@ async function runList(argv: string[]): Promise<CaptureResult> {
 // ---------------------------------------------------------------------------
 
 let tmp: string;
-let priorXdg: string | undefined;
 let priorIsTTY: boolean | undefined;
 
 beforeEach(() => {
   tmp = mkdtempSync(join(tmpdir(), "10x-cli-list-"));
-  priorXdg = process.env["XDG_CONFIG_HOME"];
-  process.env["XDG_CONFIG_HOME"] = tmp;
+  redirectConfigDir(tmp);
   priorIsTTY = process.stdout.isTTY;
   process.stdout.isTTY = false;
   resetApiContentMock();
 });
 
 afterEach(() => {
-  if (priorXdg === undefined) delete process.env["XDG_CONFIG_HOME"];
-  else process.env["XDG_CONFIG_HOME"] = priorXdg;
+  restoreConfigDir();
   if (priorIsTTY === undefined) delete (process.stdout as { isTTY?: boolean }).isTTY;
   else process.stdout.isTTY = priorIsTTY;
   resetApiContentMock();

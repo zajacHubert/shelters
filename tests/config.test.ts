@@ -32,6 +32,7 @@ import {
   saveToolConfig,
   toolConfigPath,
 } from "../src/lib/config";
+import { redirectConfigDir, restoreConfigDir } from "./helpers/config-isolation";
 
 const isPosix = process.platform !== "win32";
 
@@ -48,17 +49,14 @@ function makeAuth(overrides: Partial<AuthData> = {}): AuthData {
 }
 
 let tmpHome: string;
-let priorXdg: string | undefined;
 
 beforeEach(() => {
   tmpHome = mkdtempSync(join(tmpdir(), "10x-cli-config-"));
-  priorXdg = process.env["XDG_CONFIG_HOME"];
-  process.env["XDG_CONFIG_HOME"] = tmpHome;
+  redirectConfigDir(tmpHome);
 });
 
 afterEach(() => {
-  if (priorXdg === undefined) delete process.env["XDG_CONFIG_HOME"];
-  else process.env["XDG_CONFIG_HOME"] = priorXdg;
+  restoreConfigDir();
   rmSync(tmpHome, { recursive: true, force: true });
 });
 

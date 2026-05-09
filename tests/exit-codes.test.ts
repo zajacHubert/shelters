@@ -39,6 +39,7 @@ import {
   resetAuthFlowMock,
 } from "./helpers/auth-flow-mock";
 import { clackMockState, resetClackMock } from "./helpers/clack-mock";
+import { redirectConfigDir, restoreConfigDir } from "./helpers/config-isolation";
 
 // ---------------------------------------------------------------------------
 // captureExit: silence stdout/stderr and intercept process.exit
@@ -111,13 +112,11 @@ async function runAuth(argv: string[]): Promise<CaptureResult> {
 // ---------------------------------------------------------------------------
 
 let tmp: string;
-let priorXdg: string | undefined;
 let priorIsTTY: boolean | undefined;
 
 beforeEach(() => {
   tmp = mkdtempSync(join(tmpdir(), "10x-cli-exit-"));
-  priorXdg = process.env["XDG_CONFIG_HOME"];
-  process.env["XDG_CONFIG_HOME"] = tmp;
+  redirectConfigDir(tmp);
   priorIsTTY = process.stdout.isTTY;
   // Default: piped stdout → JSON mode auto-engaged.
   process.stdout.isTTY = false;
@@ -126,8 +125,7 @@ beforeEach(() => {
 });
 
 afterEach(() => {
-  if (priorXdg === undefined) delete process.env["XDG_CONFIG_HOME"];
-  else process.env["XDG_CONFIG_HOME"] = priorXdg;
+  restoreConfigDir();
   if (priorIsTTY === undefined) delete (process.stdout as { isTTY?: boolean }).isTTY;
   else process.stdout.isTTY = priorIsTTY;
   // Important: leave the shared mock state pristine so other test files in
