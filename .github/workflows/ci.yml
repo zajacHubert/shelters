@@ -355,6 +355,15 @@ jobs:
                     "text": { "type": "plain_text", "text": "View Run" },
                     "url": "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
                   }
+                },
+                {
+                  "type": "context",
+                  "elements": [
+                    {
+                      "type": "mrkdwn",
+                      "text": "🔍 <${{ github.server_url }}/${{ github.repository }}/commit/${{ github.sha }}|Commit diff>  ·  📜 <${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}|Full logs>  ·  📦 <https://www.npmjs.com/package/@przeprogramowani/10x-cli|npm package>"
+                    }
+                  ]
                 }
               ]
             }
