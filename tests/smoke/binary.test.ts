@@ -89,7 +89,8 @@ describe("compiled binary", () => {
     const warm = times.slice(1);
     const avg = warm.reduce((a, b) => a + b, 0) / warm.length;
 
-    // 50ms budget for Bun compile target
-    expect(avg).toBeLessThan(50);
+    // 50ms on unix, 150ms on Windows CI (slower process spawn)
+    const budget = process.platform === "win32" ? 150 : 50;
+    expect(avg).toBeLessThan(budget);
   });
 });

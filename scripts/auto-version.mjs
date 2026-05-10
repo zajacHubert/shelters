@@ -16,6 +16,8 @@
  */
 import { readFileSync, writeFileSync } from "node:fs";
 import { execSync } from "node:child_process";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
 import { Bumper } from "conventional-recommended-bump";
 
 const PKG_PATH = "package.json";
@@ -70,13 +72,14 @@ async function main() {
   writeFileSync(PKG_PATH, `${JSON.stringify(pkg, null, 2)}\n`);
 
   const notes = formatReleaseNotes(newVersion, releasableCommits);
-  writeFileSync("/tmp/release-notes.md", notes);
+  const notesPath = join(tmpdir(), "release-notes.md");
+  writeFileSync(notesPath, notes);
 
   console.log(
     `${recommendation.releaseType}: ${currentVersion} → ${newVersion}`,
   );
   console.log(`NEW_VERSION=v${newVersion}`);
-  console.log(`RELEASE_NOTES_PATH=/tmp/release-notes.md`);
+  console.log(`RELEASE_NOTES_PATH=${notesPath}`);
 }
 
 function formatReleaseNotes(version, commits) {
