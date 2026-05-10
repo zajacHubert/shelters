@@ -287,13 +287,20 @@ jobs:
           webhook-type: incoming-webhook
           payload: |
             {
-              "text": "${{ steps.payload.outputs.failed == 'true' && '❌' || needs.version.outputs.should_release == 'true' && needs.publish-npm.result == 'success' && '📦' || '✅' }} 10x-cli pipeline",
+              "text": "${{ steps.payload.outputs.failed == 'true' && '🔴' || needs.version.outputs.should_release == 'true' && needs.publish-npm.result == 'success' && '📦' || '🟢' }} 10x-cli pipeline",
               "blocks": [
+                {
+                  "type": "header",
+                  "text": {
+                    "type": "plain_text",
+                    "text": "${{ steps.payload.outputs.failed == 'true' && '🔴' || needs.version.outputs.should_release == 'true' && needs.publish-npm.result == 'success' && '📦' || '🟢' }} 10x-cli${{ needs.version.outputs.should_release == 'true' && format(' — v{0}', needs.version.outputs.new_version) || '' }}"
+                  }
+                },
                 {
                   "type": "section",
                   "text": {
                     "type": "mrkdwn",
-                    "text": "${{ steps.payload.outputs.failed == 'true' && '❌' || needs.version.outputs.should_release == 'true' && needs.publish-npm.result == 'success' && '📦' || '✅' }} *10x-cli* — ${{ needs.version.outputs.should_release == 'true' && format('release *{0}*', needs.version.outputs.new_version) || 'pipeline' }} *${{ needs.check.result }}*\n\n*Tests:* ${{ needs.check.result }} · *E2E:* ${{ needs.e2e.result }} · *Version:* ${{ needs.version.result }}\n*npm:* ${{ needs.publish-npm.result }} · *Release:* ${{ needs.github-release.result }}\n*Commit:* <${{ github.server_url }}/${{ github.repository }}/commit/${{ github.sha }}|`${{ github.sha }}`> — ${{ steps.payload.outputs.commit_msg }}\n*Author:* ${{ github.actor }}${{ steps.payload.outputs.failed == 'true' && '\n\n⚠️ Details in #alerting' || '' }}"
+                    "text": "${{ needs.check.result == 'success' && '✅' || needs.check.result == 'skipped' && '⏭️' || '❌' }} Tests    ${{ needs.e2e.result == 'success' && '✅' || needs.e2e.result == 'skipped' && '⏭️' || '❌' }} E2E    ${{ needs.publish-npm.result == 'success' && '✅' || needs.publish-npm.result == 'skipped' && '⏭️' || '❌' }} npm    ${{ needs.github-release.result == 'success' && '✅' || needs.github-release.result == 'skipped' && '⏭️' || '❌' }} Release"
                   }
                 },
                 {
@@ -301,7 +308,7 @@ jobs:
                   "elements": [
                     {
                       "type": "mrkdwn",
-                      "text": "<${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}|View workflow run>"
+                      "text": "📝 <${{ github.server_url }}/${{ github.repository }}/commit/${{ github.sha }}|`${{ github.sha }}`> ${{ steps.payload.outputs.commit_msg }}  ·  👤 ${{ github.actor }}  ·  <${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}|🔗 Workflow>${{ steps.payload.outputs.failed == 'true' && '  ·  🔔 see #alerting' || '' }}"
                     }
                   ]
                 }
@@ -316,23 +323,38 @@ jobs:
           webhook-type: incoming-webhook
           payload: |
             {
-              "text": "❌ 10x-cli pipeline failure",
+              "text": "🚨 10x-cli pipeline failure",
               "blocks": [
+                {
+                  "type": "header",
+                  "text": {
+                    "type": "plain_text",
+                    "text": "🚨 10x-cli — FAILURE"
+                  }
+                },
+                {
+                  "type": "section",
+                  "fields": [
+                    { "type": "mrkdwn", "text": "*Tests*\n${{ needs.check.result == 'success' && '✅ passed' || needs.check.result == 'skipped' && '⏭️ skipped' || '❌ failed' }}" },
+                    { "type": "mrkdwn", "text": "*E2E*\n${{ needs.e2e.result == 'success' && '✅ passed' || needs.e2e.result == 'skipped' && '⏭️ skipped' || '❌ failed' }}" },
+                    { "type": "mrkdwn", "text": "*npm*\n${{ needs.publish-npm.result == 'success' && '✅ published' || needs.publish-npm.result == 'skipped' && '⏭️ skipped' || '❌ failed' }}" },
+                    { "type": "mrkdwn", "text": "*Release*\n${{ needs.github-release.result == 'success' && '✅ created' || needs.github-release.result == 'skipped' && '⏭️ skipped' || '❌ failed' }}" }
+                  ]
+                },
+                {
+                  "type": "divider"
+                },
                 {
                   "type": "section",
                   "text": {
                     "type": "mrkdwn",
-                    "text": "🚨 *10x-cli* — pipeline failure\n\n*Tests:* ${{ needs.check.result }}\n*E2E:* ${{ needs.e2e.result }}\n*Version:* ${{ needs.version.result }}\n*npm:* ${{ needs.publish-npm.result }}\n*Release:* ${{ needs.github-release.result }}\n\n*Commit:* <${{ github.server_url }}/${{ github.repository }}/commit/${{ github.sha }}|`${{ github.sha }}`>\n*Message:* ${{ steps.payload.outputs.commit_msg }}\n*Author:* ${{ github.actor }}"
+                    "text": "📝 *Commit:* <${{ github.server_url }}/${{ github.repository }}/commit/${{ github.sha }}|`${{ github.sha }}`>\n${{ steps.payload.outputs.commit_msg }}\n\n👤 *Author:* ${{ github.actor }}"
+                  },
+                  "accessory": {
+                    "type": "button",
+                    "text": { "type": "plain_text", "text": "View Run" },
+                    "url": "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
                   }
-                },
-                {
-                  "type": "context",
-                  "elements": [
-                    {
-                      "type": "mrkdwn",
-                      "text": "<${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}|View workflow run>"
-                    }
-                  ]
                 }
               ]
             }
