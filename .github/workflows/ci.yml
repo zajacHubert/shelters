@@ -274,21 +274,55 @@ jobs:
         run: |
           MSG=$(echo "${{ github.event.head_commit.message }}" | head -1 | cut -c1-80)
           echo "commit_msg=${MSG}" >> "$GITHUB_OUTPUT"
+          if [[ "${{ needs.check.result }}" != "success" || "${{ needs.e2e.result }}" == "failure" || "${{ needs.publish-npm.result }}" == "failure" ]]; then
+            echo "failed=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "failed=false" >> "$GITHUB_OUTPUT"
+          fi
 
-      - name: Post pipeline result to Slack
+      - name: Post to #observability
         uses: slackapi/slack-github-action@v2
         with:
           webhook: ${{ secrets.SLACK_WEBHOOK_URL }}
           webhook-type: incoming-webhook
           payload: |
             {
-              "text": "${{ needs.check.result != 'success' && '❌' || needs.version.outputs.should_release == 'true' && needs.publish-npm.result == 'success' && '📦' || '✅' }} 10x-cli pipeline",
+              "text": "${{ steps.payload.outputs.failed == 'true' && '❌' || needs.version.outputs.should_release == 'true' && needs.publish-npm.result == 'success' && '📦' || '✅' }} 10x-cli pipeline",
               "blocks": [
                 {
                   "type": "section",
                   "text": {
                     "type": "mrkdwn",
-                    "text": "${{ needs.check.result != 'success' && '❌' || needs.version.outputs.should_release == 'true' && needs.publish-npm.result == 'success' && '📦' || '✅' }} *10x-cli* — ${{ needs.version.outputs.should_release == 'true' && format('release *{0}*', needs.version.outputs.new_version) || 'pipeline' }} *${{ needs.check.result }}*\n\n*Tests:* ${{ needs.check.result }} · *E2E:* ${{ needs.e2e.result }} · *Version:* ${{ needs.version.result }}\n*npm:* ${{ needs.publish-npm.result }} · *Release:* ${{ needs.github-release.result }}\n*Commit:* <${{ github.server_url }}/${{ github.repository }}/commit/${{ github.sha }}|`${{ github.sha }}`> — ${{ steps.payload.outputs.commit_msg }}\n*Author:* ${{ github.actor }}"
+                    "text": "${{ steps.payload.outputs.failed == 'true' && '❌' || needs.version.outputs.should_release == 'true' && needs.publish-npm.result == 'success' && '📦' || '✅' }} *10x-cli* — ${{ needs.version.outputs.should_release == 'true' && format('release *{0}*', needs.version.outputs.new_version) || 'pipeline' }} *${{ needs.check.result }}*\n\n*Tests:* ${{ needs.check.result }} · *E2E:* ${{ needs.e2e.result }} · *Version:* ${{ needs.version.result }}\n*npm:* ${{ needs.publish-npm.result }} · *Release:* ${{ needs.github-release.result }}\n*Commit:* <${{ github.server_url }}/${{ github.repository }}/commit/${{ github.sha }}|`${{ github.sha }}`> — ${{ steps.payload.outputs.commit_msg }}\n*Author:* ${{ github.actor }}${{ steps.payload.outputs.failed == 'true' && '\n\n⚠️ Details in #alerting' || '' }}"
+                  }
+                },
+                {
+                  "type": "context",
+                  "elements": [
+                    {
+                      "type": "mrkdwn",
+                      "text": "<${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}|View workflow run>"
+                    }
+                  ]
+                }
+              ]
+            }
+
+      - name: Post to #alerting
+        if: steps.payload.outputs.failed == 'true'
+        uses: slackapi/slack-github-action@v2
+        with:
+          webhook: ${{ secrets.SLACK_ALERTS_WEBHOOK_URL }}
+          webhook-type: incoming-webhook
+          payload: |
+            {
+              "text": "❌ 10x-cli pipeline failure",
+              "blocks": [
+                {
+                  "type": "section",
+                  "text": {
+                    "type": "mrkdwn",
+                    "text": "🚨 *10x-cli* — pipeline failure\n\n*Tests:* ${{ needs.check.result }}\n*E2E:* ${{ needs.e2e.result }}\n*Version:* ${{ needs.version.result }}\n*npm:* ${{ needs.publish-npm.result }}\n*Release:* ${{ needs.github-release.result }}\n\n*Commit:* <${{ github.server_url }}/${{ github.repository }}/commit/${{ github.sha }}|`${{ github.sha }}`>\n*Message:* ${{ steps.payload.outputs.commit_msg }}\n*Author:* ${{ github.actor }}"
                   }
                 },
                 {
