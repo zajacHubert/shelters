@@ -24,7 +24,7 @@ export async function authenticateTestUser(configDir: string): Promise<void> {
   const earlyExit = result.then((r) => {
     if (r.exitCode !== 0) {
       throw new Error(
-        `Auth CLI exited with code ${r.exitCode}. stdout: ${r.stdout} stderr: ${r.stderr}`,
+        `Auth CLI exited early with code ${r.exitCode}. stdout: ${r.stdout} stderr: ${r.stderr}`,
       );
     }
   });

@@ -37,7 +37,7 @@ describe("e2e: auth flow", () => {
       const earlyExit = result.then((r) => {
         if (r.exitCode !== 0) {
           throw new Error(
-            `Auth CLI exited early with code ${r.exitCode}. stderr: ${r.stderr}`,
+            `Auth CLI exited early with code ${r.exitCode}. stdout: ${r.stdout} stderr: ${r.stderr}`,
           );
         }
       });
