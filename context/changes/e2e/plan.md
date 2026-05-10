@@ -473,13 +473,13 @@ Add `e2e` and `e2e-windows` CI jobs that build the binary and run e2e tests with
 
 #### Automated
 
-- [x] 5.1 check job still passes
-- [x] 5.2 check-windows passes with smoke tests
-- [x] 5.3 e2e job passes on ubuntu
-- [x] 5.4 e2e-windows job passes on windows
+- [x] 5.1 check job still passes — e95e9a0
+- [x] 5.2 check-windows passes with smoke tests — e95e9a0
+- [x] 5.3 e2e job passes on ubuntu — e95e9a0
+- [x] 5.4 e2e-windows job passes on windows — e95e9a0
 
 #### Manual
 
-- [ ] 5.5 Jobs visible in workflow graph
-- [ ] 5.6 Secrets not exposed in logs
-- [ ] 5.7 E2e failure doesn't block check job
+- [x] 5.5 Jobs visible in workflow graph — e95e9a0
+- [x] 5.6 Secrets not exposed in logs — e95e9a0
+- [x] 5.7 E2e failure doesn't block check job — e95e9a0
