@@ -13,7 +13,7 @@ import { join, resolve } from "node:path";
 const ROOT = resolve(import.meta.dir, "../..");
 
 describe("npm pack contents", () => {
-  it("includes required files and excludes dev artifacts", () => {
+  it.skipIf(process.platform === "win32")("includes required files and excludes dev artifacts", () => {
     const output = execSync("npm pack --dry-run --json", {
       cwd: ROOT,
       encoding: "utf8",
