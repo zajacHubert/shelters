@@ -6,7 +6,7 @@
  */
 import { describe, it, expect } from "bun:test";
 import { execSync } from "node:child_process";
-import { readFileSync, mkdtempSync, rmSync } from "node:fs";
+import { readFileSync, writeFileSync, copyFileSync, appendFileSync, mkdtempSync, mkdirSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
 
@@ -66,27 +66,36 @@ describe("auto-version script", () => {
     const tmpDir = mkdtempSync(join(tmpdir(), "10x-autoversion-"));
 
     try {
-      // Initialize repo with a v1.0.0 tag, then add commits that touch
-      // src/ so the git-diff release gate sees real file changes.
+      // Write files via Node.js to avoid shell quoting issues on Windows.
+      writeFileSync(join(tmpDir, "package.json"), '{"version":"1.0.0"}');
+      mkdirSync(join(tmpDir, "src"), { recursive: true });
+      writeFileSync(join(tmpDir, "src/index.ts"), "// placeholder\n");
+
+      // Initialize repo with a v1.0.0 tag.
       execSync(
         [
           "git init -q",
           'git config user.name "test"',
           'git config user.email "test@test.com"',
-          'echo \'{"version":"1.0.0"}\' > package.json',
-          "mkdir -p src",
-          'echo "// placeholder" > src/index.ts',
           "git add -A",
           'git commit -m "initial" -q',
           "git tag v1.0.0",
-          ...commits.map((msg) => [
-            'echo "// change" >> src/index.ts',
-            "git add -A",
-            `git commit -m "${msg}" -q`,
-          ].join(" && ")),
-          `cp "${ROOT}/scripts/auto-version.mjs" ./auto-version.mjs`,
         ].join(" && "),
         { cwd: tmpDir, stdio: "pipe" },
+      );
+
+      // Add commits that touch src/ so the git-diff release gate fires.
+      for (const msg of commits) {
+        appendFileSync(join(tmpDir, "src/index.ts"), "// change\n");
+        execSync(`git add -A && git commit -m "${msg}" -q`, {
+          cwd: tmpDir,
+          stdio: "pipe",
+        });
+      }
+
+      copyFileSync(
+        join(ROOT, "scripts/auto-version.mjs"),
+        join(tmpDir, "auto-version.mjs"),
       );
 
       const homeEnv = process.platform === "win32"
