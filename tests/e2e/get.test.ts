@@ -1,10 +1,11 @@
 import { describe, it, expect, beforeAll, afterAll } from "bun:test";
 import { binaryExists, runCli, cleanupTempDirs } from "./support/cli";
 import { hasAuthSecrets } from "./support/env";
-import { ensureSharedAuth } from "./support/auth-setup";
+import { ensureSharedAuth, AuthRateLimitedError } from "./support/auth-setup";
 
 describe("e2e: get", () => {
   let configDir: string;
+  let authSkipped = false;
 
   beforeAll(async () => {
     if (!binaryExists()) {
@@ -14,7 +15,15 @@ describe("e2e: get", () => {
     }
     if (!hasAuthSecrets()) return;
 
-    configDir = await ensureSharedAuth();
+    try {
+      configDir = await ensureSharedAuth();
+    } catch (err) {
+      if (err instanceof AuthRateLimitedError) {
+        authSkipped = true;
+        return;
+      }
+      throw err;
+    }
   }, 60_000);
 
   afterAll(() => cleanupTempDirs());
@@ -22,8 +31,8 @@ describe("e2e: get", () => {
   it(
     "get m1l1 --dry-run --json returns write results",
     () => {
-      if (!hasAuthSecrets()) {
-        console.log("Skipping: E2E auth secrets not available");
+      if (!hasAuthSecrets() || authSkipped) {
+        console.log("Skipping: E2E auth not available");
         return;
       }
 
@@ -57,8 +66,8 @@ describe("e2e: get", () => {
   it(
     "get m1l99 --json exits with NOT_FOUND",
     () => {
-      if (!hasAuthSecrets()) {
-        console.log("Skipping: E2E auth secrets not available");
+      if (!hasAuthSecrets() || authSkipped) {
+        console.log("Skipping: E2E auth not available");
         return;
       }
 
@@ -82,8 +91,8 @@ describe("e2e: get", () => {
   it(
     "get m1l1 --dry-run --type skills --json filters to skills only",
     () => {
-      if (!hasAuthSecrets()) {
-        console.log("Skipping: E2E auth secrets not available");
+      if (!hasAuthSecrets() || authSkipped) {
+        console.log("Skipping: E2E auth not available");
         return;
       }
 

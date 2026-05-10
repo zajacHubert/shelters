@@ -3,10 +3,11 @@ import { existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { binaryExists } from "./support/cli";
 import { hasAuthSecrets, getE2EEnv } from "./support/env";
-import { ensureSharedAuth, getSharedConfigDir } from "./support/auth-setup";
+import { ensureSharedAuth, AuthRateLimitedError } from "./support/auth-setup";
 
 describe("e2e: auth flow", () => {
   let configDir: string;
+  let authSkipped = false;
 
   beforeAll(async () => {
     if (!binaryExists()) {
@@ -16,14 +17,22 @@ describe("e2e: auth flow", () => {
     }
     if (!hasAuthSecrets()) return;
 
-    configDir = await ensureSharedAuth();
+    try {
+      configDir = await ensureSharedAuth();
+    } catch (err) {
+      if (err instanceof AuthRateLimitedError) {
+        authSkipped = true;
+        return;
+      }
+      throw err;
+    }
   }, 60_000);
 
   it(
     "completes full magic-link login flow",
     () => {
-      if (!hasAuthSecrets()) {
-        console.log("Skipping: E2E auth secrets not available");
+      if (!hasAuthSecrets() || authSkipped) {
+        console.log("Skipping: E2E auth not available");
         return;
       }
 

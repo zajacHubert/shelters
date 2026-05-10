@@ -5,6 +5,13 @@ import { spawnCli } from "./cli";
 import { getE2EEnv } from "./env";
 import { ResendMagicLinks } from "./resend-magic-links";
 
+export class AuthRateLimitedError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = "AuthRateLimitedError";
+  }
+}
+
 export async function authenticateTestUser(configDir: string): Promise<void> {
   const authPath = join(configDir, "10x-cli", "auth.json");
   if (existsSync(authPath)) {
@@ -23,6 +30,11 @@ export async function authenticateTestUser(configDir: string): Promise<void> {
 
   const earlyExit = result.then((r) => {
     if (r.exitCode !== 0) {
+      if (r.stdout.includes("rate_limited")) {
+        throw new AuthRateLimitedError(
+          "Auth rate-limited by backend. Re-run CI after a few minutes.",
+        );
+      }
       throw new Error(
         `Auth CLI exited early with code ${r.exitCode}. stdout: ${r.stdout} stderr: ${r.stderr}`,
       );
@@ -65,7 +77,7 @@ export async function authenticateTestUser(configDir: string): Promise<void> {
 }
 
 let sharedConfigDir: string | null = null;
-let sharedAuthPromise: Promise<void> | null = null;
+let sharedAuthPromise: Promise<string | null> | null = null;
 
 export function getSharedConfigDir(): string {
   if (!sharedConfigDir) {
@@ -88,11 +100,20 @@ export async function ensureSharedAuth(): Promise<string> {
   }
 
   if (!sharedAuthPromise) {
-    sharedAuthPromise = authenticateTestUser(configDir).catch((err) => {
-      sharedAuthPromise = null;
-      throw err;
-    });
+    sharedAuthPromise = authenticateTestUser(configDir)
+      .then(() => configDir)
+      .catch((err) => {
+        sharedAuthPromise = null;
+        if (err instanceof AuthRateLimitedError) {
+          console.log(`Skipping auth-dependent tests: ${err.message}`);
+          return null;
+        }
+        throw err;
+      });
   }
-  await sharedAuthPromise;
-  return configDir;
+  const result = await sharedAuthPromise;
+  if (result === null) {
+    throw new AuthRateLimitedError("Auth rate-limited — skipping");
+  }
+  return result;
 }
