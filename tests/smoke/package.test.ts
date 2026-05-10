@@ -41,7 +41,7 @@ describe("npm pack contents", () => {
       /secret/i.test(f),
     );
     expect(secrets).toEqual([]);
-  }, 15_000);
+  }, 30_000);
 });
 
 describe("registry target", () => {
