@@ -77,7 +77,8 @@ The CLI is tested on both Ubuntu and Windows in CI:
 
 | Test level | Ubuntu | Windows |
 |------------|--------|---------|
-| Unit + integration (343 tests) | `check` job | `check-windows` job (PowerShell) |
-| End-to-end (CLI ↔ API) | `e2e-cli` job | `e2e-cli-windows` job |
+| Unit + integration | `check` job | `check-windows` job (PowerShell) |
+| Smoke (compiled binary) | `check` job | `check-windows` job |
+| End-to-end (CLI ↔ production API) | `e2e` job | `e2e-windows` job |
 
-The Windows e2e job builds the CLI from source, links the `10x` binary, spins up a local API with wrangler, and runs the full test suite including `list`, `get`, `get --tool codex`, `doctor`, signature verification, and module gating.
+The e2e jobs build the compiled binary, then spawn it as a subprocess against the real production API. Auth is automated via Resend magic-link email retrieval. E2e jobs run after their respective `check` jobs pass but do not block the fast feedback loop — a flaky e2e failure won't prevent unit test results from appearing quickly.

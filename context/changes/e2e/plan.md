@@ -457,11 +457,11 @@ Add `e2e` and `e2e-windows` CI jobs that build the binary and run e2e tests with
 
 #### Automated
 
-- [x] 4.1 doctor.test.ts passes
-- [x] 4.2 list.test.ts passes
-- [x] 4.3 get.test.ts passes
-- [x] 4.4 Typecheck passes
-- [x] 4.5 Lint passes
+- [x] 4.1 doctor.test.ts passes — b12e8ff
+- [x] 4.2 list.test.ts passes — b12e8ff
+- [x] 4.3 get.test.ts passes — b12e8ff
+- [x] 4.4 Typecheck passes — b12e8ff
+- [x] 4.5 Lint passes — b12e8ff
 
 #### Manual
 
@@ -473,10 +473,10 @@ Add `e2e` and `e2e-windows` CI jobs that build the binary and run e2e tests with
 
 #### Automated
 
-- [ ] 5.1 check job still passes
-- [ ] 5.2 check-windows passes with smoke tests
-- [ ] 5.3 e2e job passes on ubuntu
-- [ ] 5.4 e2e-windows job passes on windows
+- [x] 5.1 check job still passes
+- [x] 5.2 check-windows passes with smoke tests
+- [x] 5.3 e2e job passes on ubuntu
+- [x] 5.4 e2e-windows job passes on windows
 
 #### Manual
 
