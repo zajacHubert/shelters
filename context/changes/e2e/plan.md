@@ -442,10 +442,10 @@ Add `e2e` and `e2e-windows` CI jobs that build the binary and run e2e tests with
 
 #### Automated
 
-- [x] 3.1 auth-flow.test.ts passes with valid Resend key
-- [x] 3.2 Auth.json written with valid tokens
-- [x] 3.3 Typecheck passes
-- [x] 3.4 Lint passes
+- [x] 3.1 auth-flow.test.ts passes with valid Resend key — d97ed75
+- [x] 3.2 Auth.json written with valid tokens — d97ed75
+- [x] 3.3 Typecheck passes — d97ed75
+- [x] 3.4 Lint passes — d97ed75
 
 #### Manual
 
@@ -457,11 +457,11 @@ Add `e2e` and `e2e-windows` CI jobs that build the binary and run e2e tests with
 
 #### Automated
 
-- [ ] 4.1 doctor.test.ts passes
-- [ ] 4.2 list.test.ts passes
-- [ ] 4.3 get.test.ts passes
-- [ ] 4.4 Typecheck passes
-- [ ] 4.5 Lint passes
+- [x] 4.1 doctor.test.ts passes
+- [x] 4.2 list.test.ts passes
+- [x] 4.3 get.test.ts passes
+- [x] 4.4 Typecheck passes
+- [x] 4.5 Lint passes
 
 #### Manual
 
