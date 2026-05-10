@@ -416,8 +416,8 @@ Add `e2e` and `e2e-windows` CI jobs that build the binary and run e2e tests with
 
 #### Automated
 
-- [x] 1.1 Typecheck passes with new support files
-- [x] 1.2 Lint passes with new support files
+- [x] 1.1 Typecheck passes with new support files — 40454c4
+- [x] 1.2 Lint passes with new support files — 40454c4
 
 #### Manual
 
@@ -428,10 +428,10 @@ Add `e2e` and `e2e-windows` CI jobs that build the binary and run e2e tests with
 
 #### Automated
 
-- [ ] 2.1 global-flags.test.ts passes after build:binary
-- [ ] 2.2 auth-no-credentials.test.ts passes
-- [ ] 2.3 Typecheck passes
-- [ ] 2.4 Lint passes
+- [x] 2.1 global-flags.test.ts passes after build:binary
+- [x] 2.2 auth-no-credentials.test.ts passes
+- [x] 2.3 Typecheck passes
+- [x] 2.4 Lint passes
 
 #### Manual
 
