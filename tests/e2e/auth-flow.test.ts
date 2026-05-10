@@ -34,16 +34,32 @@ describe("e2e: auth flow", () => {
         { env: { XDG_CONFIG_HOME: configDir, APPDATA: configDir } },
       );
 
-      const callbackUrl = await resend.findCallbackUrl({
-        recipientEmail: env.inboxEmail,
-        sentAfter,
-        timeoutMs: 45_000,
-        pollIntervalMs: 1_000,
+      const earlyExit = result.then((r) => {
+        if (r.exitCode !== 0) {
+          throw new Error(
+            `Auth CLI exited early with code ${r.exitCode}. stderr: ${r.stderr}`,
+          );
+        }
       });
+
+      const callbackUrl = await Promise.race([
+        resend.findCallbackUrl({
+          recipientEmail: env.inboxEmail,
+          sentAfter,
+          timeoutMs: 45_000,
+          pollIntervalMs: 1_000,
+        }),
+        earlyExit.then(() => {
+          throw new Error("CLI exited before email was found");
+        }),
+      ]);
 
       expect(callbackUrl).toContain("/auth/callback");
 
-      await fetch(callbackUrl);
+      const callbackResp = await fetch(callbackUrl);
+      if (!callbackResp.ok) {
+        throw new Error(`Callback request failed: ${callbackResp.status}`);
+      }
 
       const cliResult = await result;
 

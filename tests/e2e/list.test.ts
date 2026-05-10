@@ -1,5 +1,5 @@
-import { describe, it, expect, beforeAll } from "bun:test";
-import { binaryExists, runCli } from "./support/cli";
+import { describe, it, expect, beforeAll, afterAll } from "bun:test";
+import { binaryExists, runCli, cleanupTempDirs } from "./support/cli";
 import { hasAuthSecrets } from "./support/env";
 import { ensureSharedAuth } from "./support/auth-setup";
 
@@ -16,6 +16,8 @@ describe("e2e: list", () => {
 
     configDir = await ensureSharedAuth();
   }, 60_000);
+
+  afterAll(() => cleanupTempDirs());
 
   it(
     "list --json returns modules array",

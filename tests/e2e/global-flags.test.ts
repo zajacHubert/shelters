@@ -1,5 +1,5 @@
-import { describe, it, expect, beforeAll } from "bun:test";
-import { binaryExists, runCli } from "./support/cli";
+import { describe, it, expect, beforeAll, afterAll } from "bun:test";
+import { binaryExists, runCli, cleanupTempDirs } from "./support/cli";
 
 describe("e2e: global flags", () => {
   beforeAll(() => {
@@ -9,6 +9,8 @@ describe("e2e: global flags", () => {
       );
     }
   });
+
+  afterAll(() => cleanupTempDirs());
 
   it("--version exits 0 with semver output", () => {
     const result = runCli(["--version"]);

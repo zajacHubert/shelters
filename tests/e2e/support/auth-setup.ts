@@ -41,7 +41,10 @@ export async function authenticateTestUser(configDir: string): Promise<void> {
     }),
   ]);
 
-  await fetch(callbackUrl);
+  const callbackResp = await fetch(callbackUrl);
+  if (!callbackResp.ok) {
+    throw new Error(`Callback request failed: ${callbackResp.status}`);
+  }
 
   const cliResult = await result;
 

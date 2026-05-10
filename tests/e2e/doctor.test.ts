@@ -1,6 +1,6 @@
-import { describe, it, expect, beforeAll } from "bun:test";
-import { binaryExists, runCli } from "./support/cli";
-import { hasAuthSecrets } from "./support/env";
+import { describe, it, expect, beforeAll, afterAll } from "bun:test";
+import { binaryExists, runCli, cleanupTempDirs } from "./support/cli";
+import { hasAuthSecrets, getE2EEnv } from "./support/env";
 import { ensureSharedAuth } from "./support/auth-setup";
 
 describe("e2e: doctor", () => {
@@ -16,6 +16,8 @@ describe("e2e: doctor", () => {
 
     configDir = await ensureSharedAuth();
   }, 60_000);
+
+  afterAll(() => cleanupTempDirs());
 
   it(
     "doctor --json reports checks with valid auth",
@@ -51,7 +53,7 @@ describe("e2e: doctor", () => {
       const authCheck = json.data.checks.find((c) => c.name === "auth");
       expect(authCheck).toBeDefined();
       expect(authCheck!.status).toBe("pass");
-      expect(authCheck!.message).toContain("smoke-test@przeprogramowani.pl");
+      expect(authCheck!.message).toContain(getE2EEnv().testEmail);
 
       const apiCheck = json.data.checks.find((c) => c.name === "api");
       expect(apiCheck).toBeDefined();

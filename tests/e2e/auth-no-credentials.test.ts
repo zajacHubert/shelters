@@ -1,5 +1,5 @@
-import { describe, it, expect, beforeAll } from "bun:test";
-import { binaryExists, runCli } from "./support/cli";
+import { describe, it, expect, beforeAll, afterAll } from "bun:test";
+import { binaryExists, runCli, cleanupTempDirs } from "./support/cli";
 
 describe("e2e: auth without credentials", () => {
   beforeAll(() => {
@@ -9,6 +9,8 @@ describe("e2e: auth without credentials", () => {
       );
     }
   });
+
+  afterAll(() => cleanupTempDirs());
 
   it("auth --status --json exits 3 (AUTH_REQUIRED) with error envelope", () => {
     const result = runCli(["auth", "--status", "--json"]);

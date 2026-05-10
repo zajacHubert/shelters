@@ -1,4 +1,4 @@
-import { existsSync } from "node:fs";
+import { existsSync, rmSync } from "node:fs";
 import { mkdtempSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { resolve, join } from "node:path";
@@ -39,8 +39,19 @@ function makeJson(stdout: string): <T>() => T {
   };
 }
 
+const tempDirs: string[] = [];
+
 function makeTempConfigDir(): string {
-  return mkdtempSync(join(tmpdir(), "10x-e2e-"));
+  const dir = mkdtempSync(join(tmpdir(), "10x-e2e-"));
+  tempDirs.push(dir);
+  return dir;
+}
+
+export function cleanupTempDirs(): void {
+  for (const dir of tempDirs) {
+    rmSync(dir, { recursive: true, force: true });
+  }
+  tempDirs.length = 0;
 }
 
 function buildEnv(
@@ -93,7 +104,7 @@ export function runCli(
 
 export function spawnCli(
   args: string[],
-  options: Omit<CliOptions, "timeout"> = {},
+  options: CliOptions = {},
 ): { proc: Subprocess; result: Promise<CliResult>; configDir: string } {
   if (!binaryExists()) {
     throw new Error(
@@ -103,6 +114,7 @@ export function spawnCli(
 
   const configDir = makeTempConfigDir();
   const env = buildEnv(configDir, options.env);
+  const timeout = options.timeout ?? 60_000;
 
   const proc = Bun.spawn([BINARY_PATH, ...args], {
     stdout: "pipe",
@@ -110,8 +122,11 @@ export function spawnCli(
     env,
   });
 
+  const killTimer = setTimeout(() => proc.kill(), timeout);
+
   const result = (async (): Promise<CliResult> => {
     const exitCode = await proc.exited;
+    clearTimeout(killTimer);
     const stdoutRaw = await new Response(proc.stdout).text();
     const stderrRaw = await new Response(proc.stderr).text();
     const stdout = normalize(stdoutRaw);
