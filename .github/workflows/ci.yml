@@ -263,3 +263,42 @@ jobs:
           tag_name: ${{ needs.version.outputs.new_version }}
           generate_release_notes: true
           files: release-assets/**/*
+
+  notify-slack:
+    needs: [check, e2e, version, publish-npm, github-release]
+    if: always() && github.event_name == 'push' && github.ref == 'refs/heads/master'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Build notification payload
+        id: payload
+        run: |
+          MSG=$(echo "${{ github.event.head_commit.message }}" | head -1 | cut -c1-80)
+          echo "commit_msg=${MSG}" >> "$GITHUB_OUTPUT"
+
+      - name: Post pipeline result to Slack
+        uses: slackapi/slack-github-action@v2
+        with:
+          webhook: ${{ secrets.SLACK_WEBHOOK_URL }}
+          webhook-type: incoming-webhook
+          payload: |
+            {
+              "text": "${{ needs.check.result != 'success' && '❌' || needs.version.outputs.should_release == 'true' && needs.publish-npm.result == 'success' && '📦' || '✅' }} 10x-cli pipeline",
+              "blocks": [
+                {
+                  "type": "section",
+                  "text": {
+                    "type": "mrkdwn",
+                    "text": "${{ needs.check.result != 'success' && '❌' || needs.version.outputs.should_release == 'true' && needs.publish-npm.result == 'success' && '📦' || '✅' }} *10x-cli* — ${{ needs.version.outputs.should_release == 'true' && format('release *{0}*', needs.version.outputs.new_version) || 'pipeline' }} *${{ needs.check.result }}*\n\n*Tests:* ${{ needs.check.result }} · *E2E:* ${{ needs.e2e.result }} · *Version:* ${{ needs.version.result }}\n*npm:* ${{ needs.publish-npm.result }} · *Release:* ${{ needs.github-release.result }}\n*Commit:* <${{ github.server_url }}/${{ github.repository }}/commit/${{ github.sha }}|`${{ github.sha }}`> — ${{ steps.payload.outputs.commit_msg }}\n*Author:* ${{ github.actor }}"
+                  }
+                },
+                {
+                  "type": "context",
+                  "elements": [
+                    {
+                      "type": "mrkdwn",
+                      "text": "<${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}|View workflow run>"
+                    }
+                  ]
+                }
+              ]
+            }
