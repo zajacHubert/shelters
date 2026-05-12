@@ -274,7 +274,7 @@ jobs:
         run: |
           MSG=$(echo "${{ github.event.head_commit.message }}" | head -1 | cut -c1-80)
           echo "commit_msg=${MSG}" >> "$GITHUB_OUTPUT"
-          if [[ "${{ needs.check.result }}" != "success" || "${{ needs.e2e.result }}" == "failure" || "${{ needs.publish-npm.result }}" == "failure" ]]; then
+          if [[ "${{ needs.check.result }}" != "success" || "${{ needs.e2e.result }}" == "failure" || "${{ needs.publish-npm.result }}" == "failure" || "${{ needs.version.result }}" == "failure" || "${{ needs.github-release.result }}" == "failure" ]]; then
             echo "failed=true" >> "$GITHUB_OUTPUT"
           else
             echo "failed=false" >> "$GITHUB_OUTPUT"
