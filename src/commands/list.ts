@@ -166,7 +166,7 @@ function renderCatalog(ctx: OutputContext, catalog: CatalogResponse): void {
   const exampleModule =
     catalog.modules.find((m) => m.effectiveState === "unlocked")?.module ??
     catalog.modules[0]?.module ??
-    1;
+    0;
 
   const lines: string[] = [];
   lines.push(`Course: ${catalog.course}`);

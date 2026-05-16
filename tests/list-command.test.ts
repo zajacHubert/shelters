@@ -462,7 +462,7 @@ describe("10x list <module> — module detail", () => {
     const err = parseErr(stdout, "invalid_module");
     expect(err.message).toContain("'6'");
     // The range goes into the hint, not the main message.
-    expect(err.hint).toContain("1");
+    expect(err.hint).toContain("0");
     expect(err.hint).toContain("5");
     expect(err.hint).toContain("10x list");
   });
@@ -474,11 +474,19 @@ describe("10x list <module> — module detail", () => {
     parseErr(stdout, "invalid_module");
   });
 
-  it("module zero → exit 2 USAGE", async () => {
+  it("module zero (prework) passes validation and delegates to API", async () => {
     writeValidAuth();
+    const calls: number[] = [];
+    apiContentMockState.fetchModuleDetailImpl = (_course, moduleArg) => {
+      calls.push(moduleArg);
+      return moduleOk(makeModuleDetail({ module: moduleArg }));
+    };
+
     const { stdout, exitCode } = await runList(["list", "0", "--json"]);
-    expect(exitCode).toBe(2);
-    parseErr(stdout, "invalid_module");
+    expect(exitCode ?? 0).toBe(0);
+    expect(calls).toEqual([0]);
+    const data = parseOk<{ module: number }>(stdout);
+    expect(data.module).toBe(0);
   });
 
   it("non-numeric module → exit 2 USAGE", async () => {

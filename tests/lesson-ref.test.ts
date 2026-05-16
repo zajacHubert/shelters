@@ -40,8 +40,16 @@ describe("parseLessonRef — valid input", () => {
     });
   });
 
+  it("parses prework m0l1 (module 0)", () => {
+    expect(parseLessonRef("m0l1")).toEqual({
+      lessonId: "m0l1",
+      module: 0,
+      lesson: 1,
+    });
+  });
+
   it("exports the module-range constants used by the parser", () => {
-    expect(MIN_MODULE).toBe(1);
+    expect(MIN_MODULE).toBe(0);
     expect(MAX_MODULE).toBe(5);
   });
 });
@@ -71,8 +79,8 @@ describe("parseLessonRef — rejected input", () => {
     expect(parseLessonRef("m1l1x")).toBeNull();
   });
 
-  it("rejects module zero (m0l1)", () => {
-    expect(parseLessonRef("m0l1")).toBeNull();
+  it("rejects negative-looking module (m-1l1 won't match regex)", () => {
+    expect(parseLessonRef("m-1l1")).toBeNull();
   });
 
   it("rejects lesson zero (m1l0)", () => {
@@ -109,9 +117,9 @@ describe("parseModuleRef — rejected forms", () => {
     expect(parseModuleRef("m6")).toBeNull();
   });
 
-  it("rejects zero '0' and 'm0'", () => {
-    expect(parseModuleRef("0")).toBeNull();
-    expect(parseModuleRef("m0")).toBeNull();
+  it("accepts zero '0' and 'm0' (prework)", () => {
+    expect(parseModuleRef("0")).toBe(0);
+    expect(parseModuleRef("m0")).toBe(0);
   });
 
   it("rejects uppercase 'M1'", () => {
