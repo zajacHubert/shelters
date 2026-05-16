@@ -57,7 +57,7 @@ describe("e2e: list", () => {
 
       expect(json.status).toBe("ok");
       expect(json.data.modules.length).toBeGreaterThan(0);
-      expect(json.data.modules[0]!.module).toBe(1);
+      expect(json.data.modules[0]!.module).toBe(0);
       expect(json.data.modules[0]!.title).toBeTruthy();
     },
     { timeout: 30_000 },

@@ -29,14 +29,14 @@ describe("e2e: get", () => {
   afterAll(() => cleanupTempDirs());
 
   it(
-    "get m1l1 --dry-run --json returns write results",
+    "get m0l1 --dry-run --json returns write results",
     () => {
       if (!hasAuthSecrets() || authSkipped) {
         console.log("Skipping: E2E auth not available");
         return;
       }
 
-      const result = runCli(["get", "m1l1", "--dry-run", "--json"], {
+      const result = runCli(["get", "m0l1", "--dry-run", "--json"], {
         env: { XDG_CONFIG_HOME: configDir, APPDATA: configDir },
       });
 
@@ -58,20 +58,20 @@ describe("e2e: get", () => {
 
       expect(json.status).toBe("ok");
       expect(json.data.dry_run).toBe(true);
-      expect(json.data.lessonId).toBe("m1l1");
+      expect(json.data.lessonId).toBe("m0l1");
     },
     { timeout: 30_000 },
   );
 
   it(
-    "get m1l99 --json exits with NOT_FOUND",
+    "get m0l99 --json exits with NOT_FOUND",
     () => {
       if (!hasAuthSecrets() || authSkipped) {
         console.log("Skipping: E2E auth not available");
         return;
       }
 
-      const result = runCli(["get", "m1l99", "--json"], {
+      const result = runCli(["get", "m0l99", "--json"], {
         env: { XDG_CONFIG_HOME: configDir, APPDATA: configDir },
       });
 
@@ -89,7 +89,7 @@ describe("e2e: get", () => {
   );
 
   it(
-    "get m1l1 --dry-run --type skills --json filters to skills only",
+    "get m0l1 --dry-run --type skills --json filters to skills only",
     () => {
       if (!hasAuthSecrets() || authSkipped) {
         console.log("Skipping: E2E auth not available");
@@ -97,7 +97,7 @@ describe("e2e: get", () => {
       }
 
       const result = runCli(
-        ["get", "m1l1", "--dry-run", "--type", "skills", "--json"],
+        ["get", "m0l1", "--dry-run", "--type", "skills", "--json"],
         { env: { XDG_CONFIG_HOME: configDir, APPDATA: configDir } },
       );
 
