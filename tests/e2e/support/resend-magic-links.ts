@@ -74,17 +74,11 @@ export class ResendMagicLinks {
         const allEmails = listData.data ?? [];
 
         if (pollCount === 0) {
-          const sample = allEmails.slice(0, 5).map((e) => ({
-            to: e.to,
-            created_at: e.created_at,
-            subject: e.subject,
-          }));
+          const matchCount = allEmails.filter((e) =>
+            (e.to ?? []).map(normalizeEmail).includes(normalizedRecipient),
+          ).length;
           console.log(
-            `[resend-poll] looking for inbox=${normalizedRecipient} after=${options.sentAfter.toISOString()}`,
-          );
-          console.log(
-            `[resend-poll] list returned ${allEmails.length} emails, first 5:`,
-            JSON.stringify(sample),
+            `[resend-poll] polling after=${options.sentAfter.toISOString()}, account inbox=${allEmails.length}, matches=${matchCount}`,
           );
         }
 
@@ -138,7 +132,7 @@ export class ResendMagicLinks {
     const suffix =
       lastError instanceof Error ? ` Last error: ${lastError.message}` : "";
     throw new Error(
-      `Timed out after ${timeoutMs}ms waiting for auth callback email to ${options.recipientEmail}. ` +
+      `Timed out after ${timeoutMs}ms waiting for auth callback email. ` +
         `Polled ${pollCount} times.${suffix}`,
     );
   }
