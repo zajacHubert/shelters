@@ -83,6 +83,53 @@ export type ApiResult<T> =
 /** Default request timeout (30 seconds) for calls without a caller-supplied signal. */
 const DEFAULT_TIMEOUT_MS = 30_000;
 
+export const UNKNOWN_API_ERROR_MESSAGE =
+  "An unknown error occurred. Please contact 10xDevs mentors and share the command that caused this. Sorry for the issue!";
+
+// Map of delivery-API error codes (the `error` field in the {error,message?}
+// envelope — see packages/api/src/routes/ in the 10x-toolkit repo) to
+// human-readable strings. The API never ships prose in `error`; it ships
+// snake_case codes like "course_not_found". Keep this list in sync with
+// the route handlers; unknown codes fall through to UNKNOWN_API_ERROR_MESSAGE.
+const ERROR_CODE_MESSAGES: Record<string, string> = {
+  // Content
+  course_not_found: "Course not found.",
+  lesson_not_found: "Lesson not found.",
+  module_not_found: "Module not found.",
+  artifact_not_found: "Artifact not found.",
+  bundle_not_found: "Bundle not found.",
+  module_locked: "This module is not available yet.",
+  signing_failed: "Could not sign the download URL. Try again in a moment.",
+  invalid_json: "The server received a malformed request.",
+  // Auth
+  unauthorized: "You are not signed in. Run `10x auth` first.",
+  no_membership: "No active course membership was found for this email.",
+  invalid_refresh_token: "Your session has expired. Run `10x auth` again.",
+  membership_revoked: "Your course membership has been revoked.",
+  rate_limited: "Too many requests. Please slow down and try again shortly.",
+  email_send_failed: "Could not send the login email. Try again in a moment.",
+  // Admin
+  admin_access_required: "This action requires admin access.",
+  // Upstream
+  circle_api_error: "The membership service is temporarily unavailable.",
+  internal_error: "The server hit an unexpected error.",
+};
+
+// Derive a user-facing message from an API error payload. The API uses
+// { error: "<code>" } everywhere, plus an optional human `message` on
+// auth routes. Returns undefined when neither yields anything usable;
+// the caller substitutes UNKNOWN_API_ERROR_MESSAGE.
+export function messageForApiError(payload: ApiErrorPayload | undefined): string | undefined {
+  if (!payload) return undefined;
+  if (typeof payload.message === "string" && payload.message.length > 0) {
+    return payload.message;
+  }
+  if (typeof payload.error === "string" && payload.error.length > 0) {
+    return ERROR_CODE_MESSAGES[payload.error];
+  }
+  return undefined;
+}
+
 interface RequestOptions {
   token?: string;
   signal?: AbortSignal;
@@ -145,11 +192,22 @@ async function request<T>(
   if (!response.ok) {
     const payload =
       parsed && typeof parsed === "object" ? (parsed as ApiErrorPayload) : undefined;
+    const mapped = messageForApiError(payload);
+    let errorMessage: string;
+    if (mapped) {
+      errorMessage = mapped;
+    } else if (payload) {
+      errorMessage = UNKNOWN_API_ERROR_MESSAGE;
+    } else if (response.statusText.length > 0) {
+      errorMessage = response.statusText;
+    } else {
+      errorMessage = UNKNOWN_API_ERROR_MESSAGE;
+    }
     return {
       ok: false,
       status: response.status,
-      code: (payload?.code as string) ?? `http_${response.status}`,
-      error: (payload?.error as string) ?? (payload?.message as string) ?? response.statusText,
+      code: typeof payload?.code === "string" ? payload.code : `http_${response.status}`,
+      error: errorMessage,
       payload,
     };
   }

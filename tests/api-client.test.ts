@@ -9,7 +9,12 @@
  */
 
 import { afterEach, beforeEach, describe, expect, it } from "bun:test";
-import { DEFAULT_API_BASE, resolveApiBase } from "../src/lib/api-client";
+import {
+  DEFAULT_API_BASE,
+  messageForApiError,
+  resolveApiBase,
+  UNKNOWN_API_ERROR_MESSAGE,
+} from "../src/lib/api-client";
 
 let priorEnv: string | undefined;
 
@@ -124,5 +129,58 @@ describe("resolveApiBase — rejected overrides", () => {
   it("rejects IPv6 localhost literal (not in the dev allowlist)", () => {
     process.env["API_BASE_URL"] = "http://[::1]:8787";
     expect(() => resolveApiBase()).toThrow(/must be/);
+  });
+});
+
+describe("messageForApiError", () => {
+  it("returns undefined when payload is undefined", () => {
+    expect(messageForApiError(undefined)).toBeUndefined();
+  });
+
+  it("prefers an explicit human `message` when present", () => {
+    expect(
+      messageForApiError({
+        error: "no_membership",
+        message: "No active course membership found for this email.",
+      }),
+    ).toBe("No active course membership found for this email.");
+  });
+
+  it("maps a known content error code to a human string", () => {
+    expect(messageForApiError({ error: "course_not_found" })).toBe("Course not found.");
+    expect(messageForApiError({ error: "lesson_not_found" })).toBe("Lesson not found.");
+    expect(messageForApiError({ error: "module_locked" })).toBe(
+      "This module is not available yet.",
+    );
+  });
+
+  it("maps known auth error codes", () => {
+    expect(messageForApiError({ error: "unauthorized" })).toBe(
+      "You are not signed in. Run `10x auth` first.",
+    );
+    expect(messageForApiError({ error: "invalid_refresh_token" })).toBe(
+      "Your session has expired. Run `10x auth` again.",
+    );
+  });
+
+  it("returns undefined for an unknown error code (caller falls back)", () => {
+    expect(messageForApiError({ error: "some_brand_new_code" })).toBeUndefined();
+  });
+
+  it("returns undefined for an empty `error` field with no `message`", () => {
+    expect(messageForApiError({ error: "" })).toBeUndefined();
+  });
+
+  it("returns undefined for a payload with no `error`/`message` keys", () => {
+    expect(messageForApiError({ module: 2, releaseAt: "2026-05-20T10:00:00Z" })).toBeUndefined();
+  });
+
+  it("ignores a non-string `error` field", () => {
+    expect(messageForApiError({ error: 123 as unknown as string })).toBeUndefined();
+  });
+
+  it("exports a non-empty mentor-facing fallback string", () => {
+    expect(UNKNOWN_API_ERROR_MESSAGE.length).toBeGreaterThan(0);
+    expect(UNKNOWN_API_ERROR_MESSAGE).toContain("10xDevs");
   });
 });
