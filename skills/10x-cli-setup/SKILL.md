@@ -1,6 +1,6 @@
 ---
 name: 10x-cli-setup
-description: ALWAYS invoke this skill when the user mentions 10x-cli, @przeprogramowani/10x-cli, the 10xDevs CLI, or the 10xDevs course environment in a setup context. This skill fetches the live README — Claude does not know 10x-cli's current install steps without it. Applies to: installing, updating, reconfiguring for different AI tools (Cursor, Copilot, Claude Code), permission/npm errors, authentication, and onboarding after 10xDevs enrollment. Excludes: developing 10x-cli source code, contributing to the repo, building similar CLIs, or general project setup.
+description: "ALWAYS invoke this skill when the user mentions 10x-cli, @przeprogramowani/10x-cli, the 10xDevs CLI, or the 10xDevs course environment in a setup context. This skill fetches the live README — Claude does not know 10x-cli's current install steps without it. Applies to: installing, updating, reconfiguring for different AI tools (Cursor, Copilot, Claude Code), permission/npm errors, authentication, and onboarding after 10xDevs enrollment. Excludes: developing 10x-cli source code, contributing to the repo, building similar CLIs, or general project setup."
 ---
 
 # 10x-cli Setup
