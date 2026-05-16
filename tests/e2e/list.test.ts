@@ -64,14 +64,14 @@ describe("e2e: list", () => {
   );
 
   it(
-    "list 1 --json returns lessons for module 1",
+    "list 0 --json returns lessons for module 0",
     () => {
       if (!hasAuthSecrets() || authSkipped) {
         console.log("Skipping: E2E auth not available");
         return;
       }
 
-      const result = runCli(["list", "1", "--json"], {
+      const result = runCli(["list", "0", "--json"], {
         env: { XDG_CONFIG_HOME: configDir, APPDATA: configDir },
       });
 
@@ -87,7 +87,7 @@ describe("e2e: list", () => {
       }>();
 
       expect(json.status).toBe("ok");
-      expect(json.data.module).toBe(1);
+      expect(json.data.module).toBe(0);
       expect(json.data.lessons.length).toBeGreaterThan(0);
     },
     { timeout: 30_000 },
