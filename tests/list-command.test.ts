@@ -345,6 +345,33 @@ describe("10x list — human output formatting", () => {
     expect(stderr).toContain("May 11, 2026");
     expect(stderr).not.toContain("2026-05-11T07:00:00Z");
   });
+
+  it("locked module detail hides lesson titles and summaries from humans", async () => {
+    writeValidAuth();
+    apiContentMockState.fetchModuleDetailImpl = () =>
+      moduleOk(
+        makeModuleDetail({
+          module: 3,
+          title: "AI workflows",
+          releaseAt: "2026-05-11T07:00:00Z",
+          effectiveState: "locked",
+          lessons: [
+            { lessonId: "m3l1", lesson: 1, title: "Secret topic", summary: "TBD" },
+            { lessonId: "m3l2", lesson: 2, title: "Another secret", summary: "TBD" },
+          ],
+        }),
+      );
+
+    const { stderr, exitCode } = await withHumanTTY(() => runList(["list", "3"]));
+    expect(exitCode ?? 0).toBe(0);
+    expect(stderr).toContain("Module 3: AI workflows");
+    expect(stderr).toContain("May 11, 2026");
+    expect(stderr).not.toContain("m3l1");
+    expect(stderr).not.toContain("m3l2");
+    expect(stderr).not.toContain("Secret topic");
+    expect(stderr).not.toContain("Another secret");
+    expect(stderr).not.toContain("TBD");
+  });
 });
 
 describe("10x list — all modules", () => {
@@ -421,6 +448,40 @@ describe("10x list <module> — module detail", () => {
     expect(data.module).toBe(1);
     expect(data.lessons).toHaveLength(2);
     expect(data.lessons[0]!.lessonId).toBe("m1l1");
+  });
+
+  it("locked module returns lessons: [] in JSON to avoid leaking titles", async () => {
+    writeValidAuth();
+    apiContentMockState.fetchModuleDetailImpl = () =>
+      moduleOk(
+        makeModuleDetail({
+          module: 3,
+          title: "AI workflows",
+          releaseAt: "2026-05-11T07:00:00Z",
+          effectiveState: "locked",
+          lessons: [
+            { lessonId: "m3l1", lesson: 1, title: "Secret topic", summary: "TBD" },
+          ],
+        }),
+      );
+
+    const { stdout, exitCode } = await runList(["list", "3", "--json"]);
+    expect(exitCode ?? 0).toBe(0);
+    const data = parseOk<{
+      module: number;
+      title: string;
+      state: string;
+      releaseAt: string;
+      lessons: unknown[];
+    }>(stdout);
+    expect(data.module).toBe(3);
+    expect(data.title).toBe("AI workflows");
+    expect(data.state).toBe("locked");
+    expect(data.releaseAt).toBe("2026-05-11T07:00:00Z");
+    expect(data.lessons).toEqual([]);
+    expect(stdout).not.toContain("Secret topic");
+    expect(stdout).not.toContain("m3l1");
+    expect(stdout).not.toContain("TBD");
   });
 
   it("accepts 'm1' prefixed form (consistent with '10x get m1l1')", async () => {

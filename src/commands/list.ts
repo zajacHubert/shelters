@@ -192,31 +192,40 @@ function formatModuleRow(m: ModuleSummary, lessonCount: number): string {
 }
 
 function renderModuleDetail(ctx: OutputContext, module: ModuleDetailResponse): void {
+  const isLocked = module.effectiveState === "locked";
+
   if (ctx.json) {
     output(ctx, "", {
       module: module.module,
       title: module.title,
       state: module.effectiveState,
       releaseAt: module.releaseAt,
-      lessons: module.lessons.map((l) => ({
-        lessonId: l.lessonId,
-        lesson: l.lesson,
-        title: l.title,
-        summary: l.summary,
-        availableLanguages: l.availableLanguages ?? ["en"],
-      })),
+      lessons: isLocked
+        ? []
+        : module.lessons.map((l) => ({
+            lessonId: l.lessonId,
+            lesson: l.lesson,
+            title: l.title,
+            summary: l.summary,
+            availableLanguages: l.availableLanguages ?? ["en"],
+          })),
     });
     return;
   }
 
-  const stateLabel =
-    module.effectiveState === "unlocked"
-      ? "unlocked"
-      : `locked — unlocks ${formatReleaseAt(module.releaseAt)}`;
+  const stateLabel = isLocked
+    ? `locked — unlocks ${formatReleaseAt(module.releaseAt)}`
+    : "unlocked";
 
   const lines: string[] = [];
   lines.push(`Module ${module.module}: ${module.title} [${stateLabel}]`);
   lines.push("");
+  if (isLocked) {
+    lines.push(`  Lessons will be available after this module unlocks on ${formatReleaseAt(module.releaseAt)}.`);
+    output(ctx, lines.join("\n"), undefined);
+    return;
+  }
+
   if (module.lessons.length === 0) {
     lines.push("  (no lessons in this module)");
   } else {
@@ -226,7 +235,6 @@ function renderModuleDetail(ctx: OutputContext, module: ModuleDetailResponse): v
     }
   }
 
-  // Show language availability hint if any lesson has more than EN
   const hasMultiLang = module.lessons.some(
     (l) => l.availableLanguages && l.availableLanguages.length > 1,
   );
