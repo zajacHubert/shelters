@@ -42,7 +42,10 @@ export function registerGetCommand(cli: CAC): void {
     .command("get <ref>", "Fetch and apply a lesson pack")
     .option("--dry-run", "Show what would be written without touching the filesystem")
     .option("--course <course>", "Override the course slug (default: 10xdevs3)")
-    .option("--tool <tool>", "AI coding tool (claude-code, cursor, copilot, codex, generic)")
+    .option(
+      "--tool <tool>",
+      "AI coding tool (claude-code, cursor, copilot, codex, windsurf, gemini, generic)",
+    )
     .option("--print", "Print artifact content to stdout instead of writing to files")
     .option("--type <type>", "Artifact type filter: skills, prompts, rules, configs")
     .option("--name <name>", "Artifact name filter (requires --type)")

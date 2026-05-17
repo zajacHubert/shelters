@@ -1,6 +1,6 @@
 /* eslint-disable */
 /**
- * Auto-generated from https://10x-toolkit-api.przeprogramowani.workers.dev/openapi.json
+ * Auto-generated from the delivery API OpenAPI spec.
  * Do not edit by hand — run `bun run generate-types` to regenerate.
  */
 export interface paths {
@@ -80,7 +80,10 @@ export interface paths {
         };
         get: {
             parameters: {
-                query?: never;
+                query?: {
+                    tool?: string;
+                    lang?: string;
+                };
                 header?: never;
                 path: {
                     course: string;
@@ -104,19 +107,31 @@ export interface paths {
                             summary: string;
                             skills: {
                                 name: string;
-                                content: string;
+                                files: {
+                                    path: string;
+                                    content: string;
+                                    executable?: boolean;
+                                }[];
+                                universalContent?: string;
+                                contentHash?: string;
                             }[];
                             prompts: {
                                 name: string;
                                 content: string;
+                                universalContent?: string;
+                                contentHash?: string;
                             }[];
                             rules: {
                                 name: string;
                                 content: string;
+                                universalContent?: string;
+                                contentHash?: string;
                             }[];
                             configs: {
                                 name: string;
                                 content: string;
+                                universalContent?: string;
+                                contentHash?: string;
                             }[];
                         };
                     };
@@ -135,6 +150,156 @@ export interface paths {
                     };
                 };
                 /** @description Course or lesson not found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            error: string;
+                        };
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/artifacts/{course}/{lessonId}/{type}/{name}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: {
+                    tool?: string;
+                    lang?: string;
+                };
+                header?: never;
+                path: {
+                    course: string;
+                    lessonId: string;
+                    type: "skills" | "prompts" | "rules" | "configs";
+                    name: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Individual artifact with content */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** @enum {string} */
+                            type: "skills";
+                            name: string;
+                            files: {
+                                path: string;
+                                content: string;
+                                executable?: boolean;
+                            }[];
+                            universalContent?: string;
+                        } | {
+                            /** @enum {string} */
+                            type: "prompts" | "rules" | "configs";
+                            name: string;
+                            content: string;
+                        };
+                    };
+                };
+                /** @description Module is locked */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            error: string;
+                            module?: number;
+                            releaseAt?: string;
+                        };
+                    };
+                };
+                /** @description Course, lesson, or artifact not found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            error: string;
+                        };
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/lessons/{course}/{lessonId}/download": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: {
+                    type?: "skills" | "prompts" | "rules" | "configs";
+                    name?: string;
+                    tool?: string;
+                    lang?: string;
+                };
+                header?: never;
+                path: {
+                    course: string;
+                    lessonId: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description ZIP bundle or raw artifact file */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/zip": unknown;
+                        "text/markdown": string;
+                    };
+                };
+                /** @description Module is locked */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            error: string;
+                            module?: number;
+                            releaseAt?: string;
+                        };
+                    };
+                };
+                /** @description Course, lesson, or artifact not found */
                 404: {
                     headers: {
                         [name: string]: unknown;
@@ -227,7 +392,7 @@ export interface paths {
                 header?: never;
                 path: {
                     course: string;
-                    module: number;
+                    module: number | null;
                 };
                 cookie?: never;
             };
@@ -252,6 +417,12 @@ export interface paths {
                                 lesson: number;
                                 title: string;
                                 summary: string;
+                                /**
+                                 * @default [
+                                 *       "en"
+                                 *     ]
+                                 */
+                                availableLanguages: string[];
                             }[];
                         };
                     };
@@ -291,7 +462,7 @@ export interface paths {
                 header?: never;
                 path: {
                     course: string;
-                    module: number;
+                    module: number | null;
                 };
                 cookie?: never;
             };

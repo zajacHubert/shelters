@@ -84,6 +84,18 @@ export const PROFILES: Record<string, ToolProfile> = {
     sentinelBegin: SENTINEL_BEGIN,
     sentinelEnd: SENTINEL_END,
   },
+  gemini: {
+    toolId: "gemini",
+    displayName: "Gemini CLI",
+    skillPath: (n) => `.gemini/skills/${n}/SKILL.md`,
+    skillDir: (n) => `.gemini/skills/${n}`,
+    promptPath: (n) => `.gemini/prompts/${n}.md`,
+    configPath: (n) => `.gemini/config-templates/${n}`,
+    rulesFile: "GEMINI.md",
+    manifestDir: ".gemini",
+    sentinelBegin: SENTINEL_BEGIN,
+    sentinelEnd: SENTINEL_END,
+  },
   generic: {
     toolId: "generic",
     displayName: "Other / Generic",
