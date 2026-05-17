@@ -23,6 +23,10 @@ import {
   resetApiContentMock,
 } from "./helpers/api-content-mock";
 import { redirectConfigDir, restoreConfigDir } from "./helpers/config-isolation";
+import {
+  resetUpdateCheckMock,
+  updateCheckMockState,
+} from "./helpers/update-check-mock";
 
 interface CaptureResult {
   stdout: string;
@@ -105,6 +109,14 @@ beforeEach(() => {
   priorCwd = process.cwd();
   process.chdir(tmpProject);
   resetApiContentMock();
+  resetUpdateCheckMock();
+  // Default: pretend the lookup failed so existing tests don't depend on
+  // any specific latest-version answer. Per-test overrides steer to ok.
+  updateCheckMockState.fetchLatestVersionImpl = () => ({
+    ok: false as const,
+    code: "network_error" as const,
+    error: "default mock — no real lookup in tests",
+  });
 });
 
 afterEach(() => {
@@ -113,6 +125,7 @@ afterEach(() => {
   if (priorIsTTY === undefined) delete (process.stdout as { isTTY?: boolean }).isTTY;
   else process.stdout.isTTY = priorIsTTY;
   resetApiContentMock();
+  resetUpdateCheckMock();
   rmSync(tmpXdg, { recursive: true, force: true });
   rmSync(tmpProject, { recursive: true, force: true });
 });
@@ -303,6 +316,55 @@ describe("10x doctor — tool-profile-aware directory check", () => {
     const toolDir = report.checks.find((c) => c.name === "tool-dir");
     expect(toolDir?.status).toBe("fail");
     expect(toolDir?.message).toContain(".windsurf/");
+  });
+});
+
+describe("10x doctor — version check against npm registry", () => {
+  it("warns when a newer version is published on npm", async () => {
+    writeValidAuth();
+    healthyApi();
+    updateCheckMockState.fetchLatestVersionImpl = () => ({
+      ok: true as const,
+      version: "999.0.0",
+    });
+    const { stdout, exitCode } = await runDoctor(["doctor", "--json"]);
+    expect(exitCode ?? 0).toBe(0);
+    const report = parseDoctor(stdout);
+    const version = report.checks.find((c) => c.name === "version");
+    expect(version?.status).toBe("warn");
+    expect(version?.message).toContain("999.0.0");
+    expect(version?.hint).toContain("npm install -g @przeprogramowani/10x-cli");
+    expect((version?.details as { outdated?: boolean } | undefined)?.outdated).toBe(true);
+  });
+
+  it("passes when the local version matches the registry", async () => {
+    writeValidAuth();
+    healthyApi();
+    const local = (await import("../package.json", { with: { type: "json" } }))
+      .default.version;
+    updateCheckMockState.fetchLatestVersionImpl = () => ({
+      ok: true as const,
+      version: local,
+    });
+
+    const { stdout, exitCode } = await runDoctor(["doctor", "--json"]);
+    expect(exitCode ?? 0).toBe(0);
+    const report = parseDoctor(stdout);
+    const version = report.checks.find((c) => c.name === "version");
+    expect(version?.status).toBe("pass");
+    expect(version?.message).toContain("up to date");
+  });
+
+  it("falls back to pass when the registry lookup fails", async () => {
+    writeValidAuth();
+    healthyApi();
+    // Default mock already returns network_error — assert doctor swallows it.
+    const { stdout, exitCode } = await runDoctor(["doctor", "--json"]);
+    expect(exitCode ?? 0).toBe(0);
+    const report = parseDoctor(stdout);
+    const version = report.checks.find((c) => c.name === "version");
+    expect(version?.status).toBe("pass");
+    expect(version?.message).toContain("update check skipped");
   });
 });
 

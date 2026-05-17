@@ -7,6 +7,7 @@ import { isExpired, isNearExpiry } from "../lib/auth-guard";
 import { configDir, readAuth, readToolConfig } from "../lib/config";
 import { formatReleaseAt } from "../lib/format";
 import { PROFILES, DEFAULT_TOOL } from "../lib/tool-profile";
+import { compareSemver, fetchLatestVersion, upgradeCommand } from "../lib/update-check";
 import {
   type GlobalFlags,
   type OutputContext,
@@ -47,7 +48,7 @@ export async function runDoctor(ctx: OutputContext): Promise<void> {
   checks.push(checkAuth());
   checks.push(await checkApiConnectivity());
   checks.push(checkConfigDirectory());
-  checks.push(checkCliVersion());
+  checks.push(await checkCliVersion());
   checks.push(checkToolDirectory());
 
   const failed = checks.filter((c) => c.status === "fail").length;
@@ -208,16 +209,37 @@ function checkConfigDirectory(): CheckResult {
   }
 }
 
-function checkCliVersion(): CheckResult {
-  // Phase 4: local-only version check. Later phases can compare against a
-  // `/meta/cli-version` endpoint; that endpoint is not yet in the OpenAPI
-  // spec, so we don't hit it here to avoid emitting a spurious warning.
+async function checkCliVersion(): Promise<CheckResult> {
+  const current = packageJson.version;
+  const latest = await fetchLatestVersion({ timeoutMs: 2_000 });
+  // Lookup failure: never block the user offline — report local version as pass
+  // and surface the reason under details for --verbose / debugging.
+  if (!latest.ok) {
+    return {
+      name: "version",
+      label: "Version",
+      status: "pass",
+      message: `10x-cli ${current} (update check skipped).`,
+      details: { version: current, lookup: { ok: false, code: latest.code } },
+    };
+  }
+  const cmp = compareSemver(current, latest.version);
+  if (cmp < 0) {
+    return {
+      name: "version",
+      label: "Version",
+      status: "warn",
+      message: `10x-cli ${current} is behind latest ${latest.version}.`,
+      hint: `Upgrade with '${upgradeCommand()}'.`,
+      details: { version: current, latest: latest.version, outdated: true },
+    };
+  }
   return {
     name: "version",
     label: "Version",
     status: "pass",
-    message: `10x-cli ${packageJson.version}.`,
-    details: { version: packageJson.version },
+    message: `10x-cli ${current} — up to date.`,
+    details: { version: current, latest: latest.version, outdated: false },
   };
 }
 
