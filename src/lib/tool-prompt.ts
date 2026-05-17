@@ -45,6 +45,13 @@ async function resolveProfileOnly(
         `Unknown tool '${flagOverride}'. Supported: ${Object.keys(PROFILES).join(", ")}`,
       );
     }
+    const existing = readToolConfig();
+    if (existing?.tool !== flagOverride) {
+      saveToolConfig({ ...(existing ?? {}), tool: flagOverride });
+      if (process.stdout.isTTY) {
+        process.stderr.write(`Default tool set to ${profile.displayName}.\n`);
+      }
+    }
     return profile;
   }
 

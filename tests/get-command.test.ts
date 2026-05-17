@@ -19,7 +19,7 @@ import { join } from "node:path";
 import cac from "cac";
 import type { ApiResult } from "../src/lib/api-client";
 import type { LessonBundle } from "../src/lib/api-content";
-import { AUTH_FILE_VERSION, type AuthData, saveAuth } from "../src/lib/config";
+import { AUTH_FILE_VERSION, type AuthData, saveAuth, readToolConfig, saveToolConfig } from "../src/lib/config";
 // IMPORTANT: import the shared mock BEFORE any dynamic import of the command.
 import {
   apiContentMockState,
@@ -433,5 +433,68 @@ describe("10x get — --lang flag", () => {
     expect(exitCode ?? 0).toBe(0);
     expect(stderr).toContain("PL not available");
     expect(stderr).toContain("showing EN");
+  });
+});
+
+describe("10x get — --tool persistence", () => {
+  it("--tool cursor persists tool to config.json", async () => {
+    writeValidAuth();
+    apiContentMockState.fetchLessonImpl = () => lessonOk(makeBundle());
+
+    const { exitCode } = await runGet(["get", "m1l1", "--tool", "cursor", "--json"]);
+    expect(exitCode ?? 0).toBe(0);
+
+    const config = readToolConfig();
+    expect(config?.tool).toBe("cursor");
+  });
+
+  it("subsequent call without --tool resolves to the persisted tool", async () => {
+    writeValidAuth();
+    saveToolConfig({ tool: "cursor" });
+
+    let capturedTool: string | undefined;
+    apiContentMockState.fetchLessonImpl = (_course, _lessonId, _token, options) => {
+      capturedTool = options?.tool;
+      return lessonOk(makeBundle());
+    };
+
+    const { exitCode } = await runGet(["get", "m1l1", "--json"]);
+    expect(exitCode ?? 0).toBe(0);
+    expect(capturedTool).toBe("cursor");
+  });
+
+  it("shows feedback on stderr when tool changes (TTY mode)", async () => {
+    writeValidAuth();
+    apiContentMockState.fetchLessonImpl = () => lessonOk(makeBundle());
+
+    process.stdout.isTTY = true;
+    const { stderr, exitCode } = await runGet(["get", "m1l1", "--tool", "cursor", "--json"]);
+    expect(exitCode ?? 0).toBe(0);
+    expect(stderr).toContain("Default tool set to Cursor.");
+  });
+
+  it("no feedback when --tool matches already-persisted tool", async () => {
+    writeValidAuth();
+    saveToolConfig({ tool: "cursor" });
+    apiContentMockState.fetchLessonImpl = () => lessonOk(makeBundle());
+
+    process.stdout.isTTY = true;
+    const { stderr, exitCode } = await runGet(["get", "m1l1", "--tool", "cursor", "--json"]);
+    expect(exitCode ?? 0).toBe(0);
+    expect(stderr).not.toContain("Default tool set to");
+  });
+
+  it("preserves existing lang and acknowledgedOrphans when persisting tool", async () => {
+    writeValidAuth();
+    saveToolConfig({ tool: "claude-code", lang: "pl", acknowledgedOrphans: ["copilot"] });
+    apiContentMockState.fetchLessonImpl = () => lessonOk(makeBundle());
+
+    const { exitCode } = await runGet(["get", "m1l1", "--tool", "cursor", "--json"]);
+    expect(exitCode ?? 0).toBe(0);
+
+    const config = readToolConfig();
+    expect(config?.tool).toBe("cursor");
+    expect(config?.lang).toBe("pl");
+    expect(config?.acknowledgedOrphans).toEqual(["copilot"]);
   });
 });
