@@ -52,23 +52,23 @@ Once installed, just tell your agent to **set up 10x-cli** and it will pick up t
 
 ## Commands
 
-| Command | Description |
-|---------|-------------|
-| `10x auth` | Magic-link login with your Circle-registered email |
-| `10x list` | Browse modules and lessons in your course |
+| Command         | Description                                          |
+| --------------- | ---------------------------------------------------- |
+| `10x auth`      | Magic-link login with your Circle-registered email   |
+| `10x list`      | Browse modules and lessons in your course            |
 | `10x get <ref>` | Fetch a lesson and apply artifacts to your workspace |
-| `10x doctor` | Diagnose auth, API connectivity, and local config |
+| `10x doctor`    | Diagnose auth, API connectivity, and local config    |
 
 ### `10x get` Flags
 
-| Flag | Description |
-|------|-------------|
-| `--tool <tool>` | AI coding tool: `claude-code`, `cursor`, `copilot`, `codex`, `windsurf`, `gemini`, `generic` |
-| `--print` | Output artifact content to stdout instead of writing files |
-| `--type <type>` | Filter by artifact type: `skills`, `prompts`, `rules`, `configs` |
-| `--name <name>` | Filter by artifact name (requires `--type`) |
-| `--dry-run` | Show what would be written without touching the filesystem |
-| `--course <slug>` | Override the course slug (default: `10xdevs3`) |
+| Flag              | Description                                                                                  |
+| ----------------- | -------------------------------------------------------------------------------------------- |
+| `--tool <tool>`   | AI coding tool: `claude-code`, `cursor`, `copilot`, `codex`, `windsurf`, `gemini`, `generic` |
+| `--print`         | Output artifact content to stdout instead of writing files                                   |
+| `--type <type>`   | Filter by artifact type: `skills`, `prompts`, `rules`, `configs`                             |
+| `--name <name>`   | Filter by artifact name (requires `--type`)                                                  |
+| `--dry-run`       | Show what would be written without touching the filesystem                                   |
+| `--course <slug>` | Override the course slug (default: `10xdevs3`)                                               |
 
 #### Examples
 
@@ -108,28 +108,26 @@ Lessons are referenced by module and lesson number:
 
 On first run, the CLI prompts you to choose your AI coding tool. Artifacts are written to the correct directory for your tool:
 
-| Tool | Directory | Rules file |
-|------|-----------|------------|
-| Claude Code | `.claude/` | `CLAUDE.md` |
-| Cursor | `.cursor/` | `.cursor/rules/10x-course.mdc` |
-| GitHub Copilot | `.github/` | `.github/copilot-instructions.md` |
-| Codex CLI | `.agents/` | `AGENTS.md` |
-| Windsurf | `.windsurf/` | `.windsurfrules` |
-| Gemini CLI | `.gemini/` | `GEMINI.md` |
-| Generic | `.ai/` | `AGENTS.md` |
+| Tool           | Directory    | Rules file                        |
+| -------------- | ------------ | --------------------------------- |
+| Claude Code    | `.claude/`   | `CLAUDE.md`                       |
+| Cursor         | `.cursor/`   | `.cursor/rules/10x-course.mdc`    |
+| GitHub Copilot | `.github/`   | `.github/copilot-instructions.md` |
+| Codex CLI      | `.agents/`   | `AGENTS.md`                       |
+| Windsurf       | `.windsurf/` | `.windsurfrules`                  |
+| Gemini CLI     | `.gemini/`   | `GEMINI.md`                       |
+| Generic        | `.ai/`       | `AGENTS.md`                       |
 
 Override anytime with `--tool <name>`. Your choice is saved in `~/.config/10x-cli/config.json`.
 
 ## Development
 
 ```bash
-bun install
-bun run dev -- --help       # Run CLI from source
-bun run build               # Build dist/index.mjs (node target)
-bun run build:binary        # Build standalone binary (~59MB)
-bun test                    # Run tests
-bun run typecheck           # tsc --noEmit
-bun run lint                # oxlint
+npm install
+npm run dev                 # Start development server (http://localhost:3000)
+npm run build               # Build for production
+npm run start               # Start production server
+npm run lint                # ESLint
 ```
 
 ## Contributing

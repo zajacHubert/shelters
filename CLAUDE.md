@@ -8,11 +8,19 @@ Early scaffold for the `@przeprogramowani/10x-cli`. Most commands are deliberate
 
 ## Commands
 
-Runtime is **Bun** (≥ Node 20 declared in `package.json` for the published binary, but local dev uses Bun directly).
+Runtime is **Node 20+** / **npm**.
 
 ```bash
-bun install
-bun run dev -- <args>      # run CLI from source, e.g. `bun run dev -- --help`
+npm install
+npm run dev                # start Next.js dev server (http://localhost:3000)
+npm run build              # build for production
+npm run start              # start production server
+npm run lint               # ESLint
+```
+
+The 10x-cli source (in `src/commands/`, `src/lib/`, `tests/`) still requires **Bun** for its own toolchain:
+
+```bash
 bun run typecheck          # tsc --noEmit
 bun run lint               # oxlint (config in .oxlintrc.json)
 bun test                   # bun:test runner; tests live in tests/
@@ -22,7 +30,7 @@ bun run build:binary       # standalone compiled binary → dist/10x (~59MB)
 bun run generate-types     # refetch /openapi.json → src/generated/api-types.ts
 ```
 
-`generate-types` hits the production delivery API by default. To regenerate against a local backend: `API_BASE_URL=http://localhost:8787 bun run generate-types`. The same env var is read at CLI runtime by `resolveApiBase()` to point the CLI at a non-production API. **The allowlist is strict**: only the exact production host or `http://localhost` / `http://127.0.0.1` (any port) are accepted — any other URL throws and exits 2. If you need a staging host, add it explicitly to `PROD_HOSTNAME` / `DEV_HOSTNAMES` in `src/lib/api-client.ts`.
+`generate-types` hits the production delivery API by default. To regenerate against a local backend: `API_BASE_URL=http://localhost:8787 npm run generate-types`. The same env var is read at CLI runtime by `resolveApiBase()` to point the CLI at a non-production API. **The allowlist is strict**: only the exact production host or `http://localhost` / `http://127.0.0.1` (any port) are accepted — any other URL throws and exits 2. If you need a staging host, add it explicitly to `PROD_HOSTNAME` / `DEV_HOSTNAMES` in `src/lib/api-client.ts`.
 
 CI (`.github/workflows/ci.yml`) runs typecheck → lint → test → build → build:binary on every PR. Anything that breaks one of those steps will block merge.
 
@@ -33,7 +41,7 @@ The CLI is a thin **CAC**-based command dispatcher (`src/index.ts`) that wires c
 - **`api-client.ts`** — typed `fetch` wrapper for the 10x-toolkit delivery API. Returns a discriminated `ApiResult<T>` (`{ ok: true, data }` | `{ ok: false, code, error }`) — callers **must** branch on `ok` and surface failures via `outputError`. Network errors collapse to `code: "network_error"`, status `0`. The HTTP surface is described by `src/generated/api-types.ts`, which is generated from `/openapi.json` and committed to git; never hand-edit it.
 - **`config.ts`** — XDG-compliant local credential store at `$XDG_CONFIG_HOME/10x-cli/auth.json` (Windows: `%APPDATA%/10x-cli/auth.json`). `saveAuth` writes atomically via `tmp` + `renameSync` with mode `0o600`, and `AuthData` is versioned (`AUTH_FILE_VERSION = 1`) — bumping the schema means bumping the version and handling the older payload in `readAuth`.
 - **`output.ts`** — the I/O contract every command must follow. Three rules to internalize:
-  1. **Stdout is reserved for data; humans read stderr.** `output()` writes JSON to stdout *or* a human message to stderr — never both.
+  1. **Stdout is reserved for data; humans read stderr.** `output()` writes JSON to stdout _or_ a human message to stderr — never both.
   2. **JSON mode is implied when stdout is not a TTY**, even without `--json`. `resolveContext()` handles this; commands should always go through it instead of checking flags directly.
   3. **Exit codes are semantic** (`ExitCodes`): `0` SUCCESS, `1` ERROR, `2` USAGE, `3` AUTH_REQUIRED, `4` FORBIDDEN, `5` NOT_FOUND. Use `outputError(ctx, code, message, exitCode, hint)` rather than `process.exit` ad-hoc, so the JSON envelope `{ status: "error", error: { code, message, hint } }` stays consistent.
 

@@ -4,7 +4,7 @@
 
 ## Hard rules
 
-- Never hand-edit `src/generated/api-types.ts` — run `bun run generate-types` to regenerate from `/openapi.json`.
+- Never hand-edit `src/generated/api-types.ts` — run `npm run generate-types` to regenerate from `/openapi.json`.
 - Never call `process.exit` directly — use `outputError(ctx, code, message, exitCode, hint)` with semantic `ExitCodes` from `@src/lib/output.ts`.
 - Stdout is for data; stderr is for humans. Route all output through `output()` / `outputError()`, never raw `console.log` to stdout.
 - Index access returns `T | undefined` (`noUncheckedIndexedAccess`) — always handle the undefined branch.
@@ -24,24 +24,20 @@ To add a command: create `src/commands/<name>.ts`, export `register<Name>Command
 
 ## Commands
 
-| Purpose                   | Command                         |
-| ------------------------- | ------------------------------- |
-| Run CLI from source       | `bun run dev -- <args>`         |
-| Type-check                | `bun run typecheck`             |
-| Lint                      | `bun run lint`                  |
-| Test suite                | `bun test`                      |
-| Single test file          | `bun test tests/<file>.test.ts` |
-| Build (ESM bundle)        | `bun run build`                 |
-| Build (standalone binary) | `bun run build:binary`          |
-| Regenerate API types      | `bun run generate-types`        |
+| Purpose                 | Command         |
+| ----------------------- | --------------- |
+| Start dev server        | `npm run dev`   |
+| Build for production    | `npm run build` |
+| Start production server | `npm run start` |
+| Lint                    | `npm run lint`  |
 
 ## TypeScript and style
 
-`strict`, `noUncheckedIndexedAccess`, `noImplicitOverride` — see `@tsconfig.json`. Linter: oxlint (`@.oxlintrc.json`). No eslint in this project.
+`strict`, `noUncheckedIndexedAccess`, `noImplicitOverride` — see `@tsconfig.json`. Linter: ESLint via `eslint-config-next` (`@eslint.config.mjs`). Run with `npm run lint`.
 
 ## Testing
 
-Runner: `bun test` (not Jest, not Vitest). Imports: `import { describe, it, expect, mock } from "bun:test"`. Module mocks: `mock.module()`, not `vi.mock`. E2E tests require a built binary and `TEST_EMAIL` / `TEST_PASSWORD` env vars; they skip cleanly without them. Smoke tests require `dist/10x` to exist.
+No test framework configured for the Next.js app yet. The `tests/` directory contains the 10x-cli source tests (bun:test); run those with `bun test` directly if needed. To add tests for the Next.js app, install Vitest or Jest with `@testing-library/react`.
 
 ## Commits and CI
 
