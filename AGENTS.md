@@ -11,6 +11,10 @@
 - Stub commands call `exitNotImplemented` — replace the call, don't work around it.
 - `API_BASE_URL` allowlist: production host or `http://localhost` / `http://127.0.0.1` only — see `@src/lib/api-client.ts`.
 
+## API contract
+
+API calls return `ApiResult<T>` — always branch on `ok`. Exit codes are semantic: `0` SUCCESS, `1` ERROR, `2` USAGE, `3` AUTH_REQUIRED, `4` FORBIDDEN, `5` NOT_FOUND. Auth stored at `$XDG_CONFIG_HOME/10x-cli/auth.json`. Full I/O contract: `@src/lib/output.ts`.
+
 ## Project structure
 
 - `src/index.ts` — CAC command dispatcher; wires all `register*Command` calls.
@@ -42,7 +46,3 @@ No test framework configured for the Next.js app yet. The `tests/` directory con
 ## Commits and CI
 
 Conventional Commits: `feat(scope):`, `fix(scope):`, `chore(release):`, `test(scope):`, `ci:`. Scope = command or module name (`get`, `auth`, `api-client`). CI gate: typecheck → lint → test → build → binary → smoke → e2e — see `@.github/workflows/ci.yml`. Runs on every PR and push to `main`/`master`.
-
-## API contract
-
-API calls return `ApiResult<T>` — always branch on `ok`. Exit codes are semantic: `0` SUCCESS, `1` ERROR, `2` USAGE, `3` AUTH_REQUIRED, `4` FORBIDDEN, `5` NOT_FOUND. Auth stored at `$XDG_CONFIG_HOME/10x-cli/auth.json`. Full I/O contract: `@src/lib/output.ts`.
