@@ -26,9 +26,13 @@ jobs:
 
       - name: Install dependencies
         run: |
-          # minimum-release-age blocks wrangler/opennextjs which publish
-          # frequently — safe to bypass in the sandboxed CI environment.
+          # minimum-release-age blocks recently published wrangler/opennextjs
           sed -i '/minimum-release-age/d' .npmrc
+          # package-lock.json was generated on Windows. The lockfile pins
+          # win32 optional binaries; deleting it forces npm to re-resolve
+          # platform bindings for linux-x64 on this runner (per the error
+          # message from @ast-grep/napi itself).
+          rm -f package-lock.json
           npm install --no-audit
 
       # Inject any NEXT_PUBLIC_* build-time variables here as `env:` entries.
