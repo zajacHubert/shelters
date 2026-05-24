@@ -1,12 +1,8 @@
 name: Deploy to Cloudflare Workers
 
 on:
-  # Auto-deploy when a push lands on main (mirrors Workers Builds behaviour
-  # for teams that prefer GitHub Actions over Cloudflare's built-in CI).
-  # Disable this trigger and use Workers Builds instead if you prefer the
-  # Cloudflare Dashboard for deploy history and preview URLs.
   push:
-    branches: [main]
+    branches: [main, master]
 
   # Always allow a manual trigger for hotfix deploys.
   workflow_dispatch:
