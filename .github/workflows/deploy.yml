@@ -25,12 +25,11 @@ jobs:
           cache: "npm"
 
       - name: Install dependencies
-        run: npm install --no-audit
-        env:
-          # Override minimum-release-age from .npmrc — wrangler and
-          # @opennextjs/cloudflare are published frequently and would
-          # otherwise be blocked when < 7 days old.
-          NPM_CONFIG_MINIMUM_RELEASE_AGE: "0"
+        run: |
+          # minimum-release-age blocks wrangler/opennextjs which publish
+          # frequently — safe to bypass in the sandboxed CI environment.
+          sed -i '/minimum-release-age/d' .npmrc
+          npm install --no-audit
 
       # Inject any NEXT_PUBLIC_* build-time variables here as `env:` entries.
       # Runtime secrets are set in the Cloudflare Dashboard and preserved by
