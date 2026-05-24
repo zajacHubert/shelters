@@ -2,8 +2,20 @@
   "extends": "./tsconfig.json",
   "compilerOptions": {
     // Only the types needed for the Next.js app (not Bun CLI tooling)
-    "types": ["node"]
+    "types": [
+      "node"
+    ],
+    "jsx": "preserve"
   },
-  "include": ["src/app/**/*", ".next/types/**/*.ts", ".next/dev/types/**/*.ts"],
-  "exclude": ["node_modules", "dist", "scripts", "tests"]
+  "include": [
+    "src/app/**/*",
+    ".next/types/**/*.ts",
+    ".next/dev/types/**/*.ts"
+  ],
+  "exclude": [
+    "node_modules",
+    "dist",
+    "scripts",
+    "tests"
+  ]
 }
