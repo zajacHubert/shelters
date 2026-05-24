@@ -1,0 +1,40 @@
+{
+  "$schema": "./node_modules/wrangler/config-schema.json",
+  "main": ".open-next/worker.js",
+  "name": "shelter-needs",
+  "compatibility_date": "2026-05-24",
+  "workers_dev": true,
+  "compatibility_flags": [
+    // Required: Node.js API shims (next/headers, crypto, etc.)
+    // see https://developers.cloudflare.com/workers/configuration/compatibility-flags/#nodejs-compatibility-flag
+    "nodejs_compat",
+    // Required: allows the worker to make fetch requests to external URLs (e.g. next/font/google)
+    // see https://developers.cloudflare.com/workers/configuration/compatibility-flags/#global-fetch-strictly-public
+    "global_fetch_strictly_public",
+  ],
+  "assets": {
+    "directory": ".open-next/assets",
+    "binding": "ASSETS",
+  },
+  // Self-referencing service binding — required for revalidatePath() / revalidateTag() (ISR)
+  "services": [
+    {
+      "binding": "WORKER_SELF_REFERENCE",
+      "service": "shelter-needs",
+    },
+  ],
+  // Uncomment to enable Next.js ISR caching via Cloudflare R2 (post-MVP):
+  // "r2_buckets": [
+  //   {
+  //     "binding": "NEXT_INC_CACHE_R2_BUCKET",
+  //     "bucket_name": "<BUCKET_NAME>"
+  //   }
+  // ],
+  "images": {
+    // Enables next/image optimisation via Cloudflare Images binding
+    "binding": "IMAGES",
+  },
+  "observability": {
+    "enabled": true,
+  },
+}
