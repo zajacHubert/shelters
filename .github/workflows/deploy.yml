@@ -25,7 +25,12 @@ jobs:
           cache: "npm"
 
       - name: Install dependencies
-        run: npm ci
+        run: |
+          npm ci
+          # npm ci uses the Windows-generated lockfile which only has
+          # @ast-grep/napi-win32-x64-msvc. Install the Linux binding explicitly.
+          npm install --no-save --ignore-scripts \
+            @ast-grep/napi-linux-x64-gnu@0.40.5
         env:
           # Override minimum-release-age from .npmrc — wrangler and
           # @opennextjs/cloudflare are published frequently and would
