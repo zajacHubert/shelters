@@ -30,6 +30,12 @@ jobs:
       # Inject any NEXT_PUBLIC_* build-time variables here as `env:` entries.
       # Runtime secrets are set in the Cloudflare Dashboard and preserved by
       # the --keep-vars flag already baked into the `deploy` script.
+      - name: Verify Cloudflare auth
+        run: npx wrangler whoami
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+
       - name: Deploy to Cloudflare Workers
         run: npm run deploy
         env:
