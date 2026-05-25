@@ -1,0 +1,1 @@
+This folder contains the built output assets for the worker "shelter-needs" generated at 2026-05-24T10:43:27.690Z.
