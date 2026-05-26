@@ -575,15 +575,15 @@ JWT_SECRET: ${{ secrets.JWT_SECRET }}
 
 #### Automated
 
-- [x] 3.1 `npx tsc --noEmit` passes
-- [x] 3.2 `npm run lint` passes
+- [x] 3.1 `npx tsc --noEmit` passes — 25ca82e
+- [x] 3.2 `npm run lint` passes — 25ca82e
 
 ### Phase 4: Middleware and Dashboard Placeholder
 
 #### Automated
 
-- [ ] 4.1 `npx tsc --noEmit` passes
-- [ ] 4.2 `npm run lint` passes
+- [x] 4.1 `npx tsc --noEmit` passes
+- [x] 4.2 `npm run lint` passes
 
 #### Manual
 

@@ -51,3 +51,6 @@ jobs:
           # Add as repository vars in GitHub: Settings → Secrets and variables → Variables
           NEXT_PUBLIC_SUPABASE_URL: ${{ vars.NEXT_PUBLIC_SUPABASE_URL }}
           NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: ${{ vars.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY }}
+          # Auth secret — add as repository secret: Settings → Secrets → Actions → New repository secret
+          # Name: JWT_SECRET, Value: <same hex string as in .env.local>
+          JWT_SECRET: ${{ secrets.JWT_SECRET }}
