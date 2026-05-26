@@ -13,28 +13,56 @@ function LoginForm() {
   return (
     <form action={formAction} className='w-full max-w-sm space-y-4'>
       <h1 className='text-xl font-semibold'>Logowanie</h1>
-      {state.error && <p className='text-red-600 text-sm'>{state.error}</p>}
+      {state.error && (
+        <p role='alert' className='text-red-600 text-sm'>
+          {state.error}
+        </p>
+      )}
       <input type='hidden' name='from' value={from} />
-      <input
-        name='email'
-        type='email'
-        placeholder='E-mail'
-        required
-        className='input'
-      />
-      <input
-        name='password'
-        type='password'
-        placeholder='Hasło'
-        required
-        className='input'
-      />
+
+      <div className='space-y-1'>
+        <label
+          htmlFor='email'
+          className='block text-sm font-medium text-gray-700'
+        >
+          Adres e-mail
+        </label>
+        <input
+          id='email'
+          name='email'
+          type='email'
+          placeholder='koordynator@schronisko.pl'
+          required
+          className='input'
+        />
+      </div>
+
+      <div className='space-y-1'>
+        <label
+          htmlFor='password'
+          className='block text-sm font-medium text-gray-700'
+        >
+          Hasło
+        </label>
+        <input
+          id='password'
+          name='password'
+          type='password'
+          placeholder='Twoje hasło'
+          required
+          className='input'
+        />
+      </div>
+
       <button type='submit' disabled={pending} className='btn-primary w-full'>
         {pending ? 'Logowanie…' : 'Zaloguj się'}
       </button>
-      <p className='text-sm text-center'>
+      <p className='text-sm text-center text-gray-600'>
         Nie masz konta?{' '}
-        <a href='/register' className='underline'>
+        <a
+          href='/register'
+          className='text-blue-600 underline hover:text-blue-800'
+        >
           Zarejestruj schronisko
         </a>
       </p>
