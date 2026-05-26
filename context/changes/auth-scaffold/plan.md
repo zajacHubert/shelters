@@ -568,15 +568,15 @@ JWT_SECRET: ${{ secrets.JWT_SECRET }}
 
 #### Automated
 
-- [x] 2.1 `npx tsc --noEmit` passes with auth.ts actions present
-- [x] 2.2 `npm run lint` passes
+- [x] 2.1 `npx tsc --noEmit` passes with auth.ts actions present — 678baff
+- [x] 2.2 `npm run lint` passes — 678baff
 
 ### Phase 3: Auth Pages
 
 #### Automated
 
-- [ ] 3.1 `npx tsc --noEmit` passes
-- [ ] 3.2 `npm run lint` passes
+- [x] 3.1 `npx tsc --noEmit` passes
+- [x] 3.2 `npm run lint` passes
 
 ### Phase 4: Middleware and Dashboard Placeholder
 
