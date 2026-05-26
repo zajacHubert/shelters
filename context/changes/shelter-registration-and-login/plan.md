@@ -407,35 +407,35 @@ export default function LoginPage() {
 
 #### Automated
 
-- [ ] 1.1 `npx tsc --project tsconfig.app.json --noEmit` passes
-- [ ] 1.2 `npm run lint` passes
+- [x] 1.1 `npx tsc --project tsconfig.app.json --noEmit` passes — e5ccbf4
+- [x] 1.2 `npm run lint` passes — e5ccbf4
 
 #### Manual
 
-- [ ] 1.3 `/register` — form inputs have visible border and blue focus ring
-- [ ] 1.4 `/login` — same styling applies
+- [x] 1.3 `/register` — form inputs have visible border and blue focus ring — e5ccbf4
+- [x] 1.4 `/login` — same styling applies — e5ccbf4
 
 ### Phase 2: DB Query and Dashboard Update
 
 #### Automated
 
-- [ ] 2.1 `npx tsc --project tsconfig.app.json --noEmit` passes
-- [ ] 2.2 `npm run lint` passes
+- [x] 2.1 `npx tsc --project tsconfig.app.json --noEmit` passes — 6bf60d9
+- [x] 2.2 `npm run lint` passes — 6bf60d9
 
 #### Manual
 
-- [ ] 2.3 `/dashboard` after login shows shelter name and city (not raw UUID)
+- [x] 2.3 `/dashboard` after login shows shelter name and city (not raw UUID) — 6bf60d9
 
 ### Phase 3: Form Labels and Accessibility
 
 #### Automated
 
-- [ ] 3.1 `npx tsc --project tsconfig.app.json --noEmit` passes
-- [ ] 3.2 `npm run lint` passes
+- [x] 3.1 `npx tsc --project tsconfig.app.json --noEmit` passes — f6e9f13
+- [x] 3.2 `npm run lint` passes — f6e9f13
 
 #### Manual
 
-- [ ] 3.3 `/register` — each input has a visible label above it
-- [ ] 3.4 `/login` — each input has a visible label above it
-- [ ] 3.5 Full flow: register → dashboard → logout → login → dashboard — all transitions correct
-- [ ] 3.6 Submit button shows loading text and is disabled during submission
+- [x] 3.3 `/register` — each input has a visible label above it — f6e9f13
+- [x] 3.4 `/login` — each input has a visible label above it — f6e9f13
+- [x] 3.5 Full flow: register → dashboard → logout → login → dashboard — all transitions correct — f6e9f13
+- [x] 3.6 Submit button shows loading text and is disabled during submission — f6e9f13
