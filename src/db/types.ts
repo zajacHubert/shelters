@@ -21,6 +21,7 @@ export type Database = {
           created_at?: string;
         };
         Update: Partial<Database['public']['Tables']['shelters']['Insert']>;
+        Relationships: [];
       };
       needs: {
         Row: {
@@ -42,10 +43,13 @@ export type Database = {
           created_at?: string;
         };
         Update: Partial<Database['public']['Tables']['needs']['Insert']>;
+        Relationships: [];
       };
     };
     Enums: {
       urgency_level: Urgency;
     };
+    Views: Record<string, never>;
+    Functions: Record<string, never>;
   };
 };

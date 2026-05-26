@@ -3,11 +3,12 @@
   "compilerOptions": {
     // Only the types needed for the Next.js app (not Bun CLI tooling)
     "types": ["node"],
-    "jsx": "preserve"
+    "jsx": "react-jsx"
   },
   "include": [
     "src/app/**/*",
     "src/lib/**/*",
+    "src/db/**/*",
     ".next/types/**/*.ts",
     ".next/dev/types/**/*.ts"
   ],
