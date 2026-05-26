@@ -582,13 +582,13 @@ JWT_SECRET: ${{ secrets.JWT_SECRET }}
 
 #### Automated
 
-- [x] 4.1 `npx tsc --noEmit` passes
-- [x] 4.2 `npm run lint` passes
+- [x] 4.1 `npx tsc --noEmit` passes — 026c8cc
+- [x] 4.2 `npm run lint` passes — 026c8cc
 
 #### Manual
 
-- [ ] 4.3 `/register` → fill form → `/dashboard` shows shelter ID
-- [ ] 4.4 `/dashboard` without session → redirects to `/login?from=/dashboard`
-- [ ] 4.5 `/login` → correct credentials → `/dashboard`
-- [ ] 4.6 Logout → redirects to `/`
-- [ ] 4.7 Wrong password → inline error displayed
+- [x] 4.3 `/register` → fill form → `/dashboard` shows shelter ID — 026c8cc
+- [x] 4.4 `/dashboard` without session → redirects to `/login?from=/dashboard` — 026c8cc
+- [x] 4.5 `/login` → correct credentials → `/dashboard` — 026c8cc
+- [x] 4.6 Logout → redirects to `/` — 026c8cc
+- [x] 4.7 Wrong password → inline error displayed — 026c8cc
