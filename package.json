@@ -10,11 +10,13 @@
     "preview": "opennextjs-cloudflare build && opennextjs-cloudflare preview",
     "deploy": "opennextjs-cloudflare build && opennextjs-cloudflare deploy -- --keep-vars",
     "upload": "opennextjs-cloudflare build && opennextjs-cloudflare upload",
-    "cf-typegen": "wrangler types --env-interface CloudflareEnv cloudflare-env.d.ts"
+    "cf-typegen": "wrangler types --env-interface CloudflareEnv cloudflare-env.d.ts",
+    "db:migrate": "supabase db push --linked"
   },
   "dependencies": {
     "@clack/prompts": "^0.9.1",
     "@opennextjs/cloudflare": "^1.19.11",
+    "@supabase/supabase-js": "^2.106.2",
     "cac": "^7.0.0",
     "next": "15.5.18",
     "proper-lockfile": "^4.1.2",
@@ -29,6 +31,7 @@
     "@types/react-dom": "^19",
     "eslint": "^9",
     "eslint-config-next": "15.5.18",
+    "supabase": "^2.101.0",
     "tailwindcss": "^4",
     "typescript": "^5",
     "wrangler": "^4.94.0"
