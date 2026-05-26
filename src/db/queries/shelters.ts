@@ -29,6 +29,19 @@ export async function getShelterByEmail(
   return data;
 }
 
+export async function getShelterById(
+  db: Db,
+  id: string,
+): Promise<Shelter | null> {
+  const { data, error } = await db
+    .from('shelters')
+    .select('*')
+    .eq('id', id)
+    .maybeSingle();
+  if (error) throw error;
+  return data;
+}
+
 export async function createShelter(
   db: Db,
   input: NewShelter,
