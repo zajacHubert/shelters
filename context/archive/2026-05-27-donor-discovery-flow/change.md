@@ -1,10 +1,10 @@
 ---
 change_id: donor-discovery-flow
 title: Donor discovery flow
-status: implemented
+status: archived
 created: 2026-05-27
 updated: 2026-05-27
-archived_at: null
+archived_at: 2026-05-27T12:31:54Z
 ---
 
 ## Notes

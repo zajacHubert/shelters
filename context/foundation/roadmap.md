@@ -31,7 +31,7 @@ Schroniska nie mają prostego kanału do komunikowania aktualnych potrzeb zaopat
 | F-02 | auth-scaffold                  | (fundament) autentykacja e-mail+hasło działa: rejestracja z hashowaniem hasła, sesja, ochrona tras panelu koordynatora        | F-01          | FR-001, FR-002, FR-003, NFR (hasła nie w plaintext, izolacja per schronisko) | proposed |
 | S-01 | shelter-registration-and-login | koordynator rejestruje schronisko i loguje się do panelu                                                                      | F-01, F-02    | FR-001, FR-002, FR-003, US-01                                                | proposed |
 | S-02 | needs-management-panel         | koordynator dodaje, edytuje i usuwa pozycje potrzeb z polami: nazwa, pilność, ilość, link do Allegro                          | S-01          | FR-004, FR-005, FR-006, US-01                                                | done     |
-| S-03 | donor-discovery-flow           | darczyńca przegląda schroniska po mieście, widzi potrzeby posortowane według pilności i klika link do Allegro — bez logowania | F-01          | FR-007, FR-008, FR-009, US-01                                                | proposed |
+| S-03 | donor-discovery-flow           | darczyńca przegląda schroniska po mieście, widzi potrzeby posortowane według pilności i klika link do Allegro — bez logowania | F-01          | FR-007, FR-008, FR-009, US-01                                                | done     |
 
 ## Streams
 
@@ -119,7 +119,7 @@ Fundament poniżej zakłada, że te warstwy są obecne i ich NIE przebudowuje.
 - **Unknowns:**
   - Jak osiągnąć ≤2s p95 na sieci mobilnej dla listy schronisk — SSR, SSG czy ISR? — Owner: developer. Block: no.
 - **Risk:** NFR wymaga ≤2s p95 z sieci mobilnej — wybór strategii renderowania (SSR/SSG/ISR) ma znaczący wpływ na wydajność i powinien być podjęty w `/10x-plan donor-discovery-flow`, nie odkładany.
-- **Status:** proposed
+- **Status:** done
 
 ## Backlog Handoff
 
@@ -148,3 +148,4 @@ _(Brak otwartych pytań na poziomie roadmapy. PRD miał 0 otwartych pytań; decy
 ## Done
 
 - **S-02: koordynator może dodać pozycję potrzeby (nazwa, status pilności: pilne/potrzebne/mile widziane, potrzebna ilość, opcjonalny link do Allegro), edytować istniejącą pozycję i usunąć ją.** — Archived 2026-05-27 → `context/archive/2026-05-26-needs-management-panel/`. Lesson: —.
+- **S-03: darczyńca może przeglądać listę schronisk filtrowaną po mieście (bez logowania), wejść na stronę schroniska, zobaczyć potrzeby posortowane według pilności (pilne → potrzebne → mile widziane) i kliknąć "Kup na Allegro →" otwierający Allegro w nowej karcie.** — Archived 2026-05-27 → `context/archive/2026-05-27-donor-discovery-flow/`. Lesson: —.
