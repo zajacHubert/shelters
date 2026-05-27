@@ -86,7 +86,10 @@ export default function RegisterPage() {
       </button>
       <p className='text-sm text-center text-gray-600'>
         Masz już konto?{' '}
-        <a href='/login' className='text-blue-600 underline hover:text-blue-800'>
+        <a
+          href='/login'
+          className='text-blue-600 underline hover:text-blue-800'
+        >
           Zaloguj się
         </a>
       </p>
