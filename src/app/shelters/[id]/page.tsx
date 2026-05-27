@@ -46,7 +46,9 @@ export default async function ShelterPage({ params }: ShelterPageProps) {
       </header>
 
       {needs.length === 0 ? (
-        <p className='text-sm text-gray-500'>To schronisko nie dodalo jeszcze potrzeb.</p>
+        <p className='text-sm text-gray-500'>
+          To schronisko nie dodalo jeszcze potrzeb.
+        </p>
       ) : (
         <ul className='space-y-3'>
           {needs.map((need) => (

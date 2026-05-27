@@ -13,10 +13,10 @@ Deliver the anonymous donor MVP flow: city-based shelter discovery and shelter d
 
 ## Phase Summary
 
-| Phase | What | Files |
-| ----- | ---- | ----- |
-| 1 | Public city search page | `src/app/page.tsx` |
-| 2 | Shelter detail + needs + Allegro CTA | `src/app/shelters/[id]/page.tsx` (+ optional tiny CSS touch in `src/app/globals.css`) |
+| Phase | What                                 | Files                                                                                 |
+| ----- | ------------------------------------ | ------------------------------------------------------------------------------------- |
+| 1     | Public city search page              | `src/app/page.tsx`                                                                    |
+| 2     | Shelter detail + needs + Allegro CTA | `src/app/shelters/[id]/page.tsx` (+ optional tiny CSS touch in `src/app/globals.css`) |
 
 ## Exit Criteria
 
