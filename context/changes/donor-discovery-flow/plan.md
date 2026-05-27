@@ -132,25 +132,25 @@ Add shelter detail route with sorted needs and CTA links.
 
 #### Automated
 
-- [x] 1.1 `npx tsc --project tsconfig.app.json --noEmit` passes
-- [x] 1.2 `npm run lint` passes
+- [x] 1.1 `npx tsc --project tsconfig.app.json --noEmit` passes — 6965020
+- [x] 1.2 `npm run lint` passes — 6965020
 
 #### Manual
 
-- [x] 1.3 `/` shows city search form without login
-- [x] 1.4 Known city returns shelters with links
-- [x] 1.5 Unknown city shows empty-state message
+- [x] 1.3 `/` shows city search form without login — 6965020
+- [x] 1.4 Known city returns shelters with links — 6965020
+- [x] 1.5 Unknown city shows empty-state message — 6965020
 
 ### Phase 2: Public shelter detail with needs and Allegro link
 
 #### Automated
 
-- [x] 2.1 `npx tsc --project tsconfig.app.json --noEmit` passes
-- [x] 2.2 `npm run lint` passes
+- [x] 2.1 `npx tsc --project tsconfig.app.json --noEmit` passes — 6965020
+- [x] 2.2 `npm run lint` passes — 6965020
 
 #### Manual
 
-- [x] 2.3 Shelter detail renders needs for selected shelter
-- [x] 2.4 Needs are ordered `pilne -> potrzebne -> mile_widziane`
-- [x] 2.5 Allegro CTA appears only for rows with link and opens new tab
-- [x] 2.6 Public donor flow works without login redirects
+- [x] 2.3 Shelter detail renders needs for selected shelter — 6965020
+- [x] 2.4 Needs are ordered `pilne -> potrzebne -> mile_widziane` — 6965020
+- [x] 2.5 Allegro CTA appears only for rows with link and opens new tab — 6965020
+- [x] 2.6 Public donor flow works without login redirects — 6965020
