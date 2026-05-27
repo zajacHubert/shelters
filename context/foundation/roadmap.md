@@ -3,7 +3,7 @@ project: ShelterNeeds
 version: 1
 status: draft
 created: 2026-05-25
-updated: 2026-05-25
+updated: 2026-05-27
 prd_version: 1
 main_goal: speed
 top_blocker: capacity
@@ -30,7 +30,7 @@ Schroniska nie mają prostego kanału do komunikowania aktualnych potrzeb zaopat
 | F-01 | data-layer-foundation          | (fundament) warstwa danych gotowa: schemat tabel schronisk i potrzeb, migracje, izolacja per schronisko                       | —             | NFR (izolacja per schronisko, hasła nie w plaintext)                         | ready    |
 | F-02 | auth-scaffold                  | (fundament) autentykacja e-mail+hasło działa: rejestracja z hashowaniem hasła, sesja, ochrona tras panelu koordynatora        | F-01          | FR-001, FR-002, FR-003, NFR (hasła nie w plaintext, izolacja per schronisko) | proposed |
 | S-01 | shelter-registration-and-login | koordynator rejestruje schronisko i loguje się do panelu                                                                      | F-01, F-02    | FR-001, FR-002, FR-003, US-01                                                | proposed |
-| S-02 | needs-management-panel         | koordynator dodaje, edytuje i usuwa pozycje potrzeb z polami: nazwa, pilność, ilość, link do Allegro                          | S-01          | FR-004, FR-005, FR-006, US-01                                                | proposed |
+| S-02 | needs-management-panel         | koordynator dodaje, edytuje i usuwa pozycje potrzeb z polami: nazwa, pilność, ilość, link do Allegro                          | S-01          | FR-004, FR-005, FR-006, US-01                                                | done     |
 | S-03 | donor-discovery-flow           | darczyńca przegląda schroniska po mieście, widzi potrzeby posortowane według pilności i klika link do Allegro — bez logowania | F-01          | FR-007, FR-008, FR-009, US-01                                                | proposed |
 
 ## Streams
@@ -80,7 +80,7 @@ Fundament poniżej zakłada, że te warstwy są obecne i ich NIE przebudowuje.
 - **Blockers:** —
 - **Unknowns:** Która biblioteka auth jest kompatybilna z Next.js na Cloudflare Workers edge runtime (NextAuth.js v5, better-auth, Supabase Auth)? — Owner: developer. Block: no.
 - **Risk:** Część bibliotek auth nie wspiera Cloudflare Workers edge runtime (brak Node.js globals); weryfikacja kompatybilności przed planowaniem zapobiegnie konieczności restartu F-02.
-- **Status:** proposed
+- **Status:** done
 
 ## Slices
 
@@ -147,4 +147,4 @@ _(Brak otwartych pytań na poziomie roadmapy. PRD miał 0 otwartych pytań; decy
 
 ## Done
 
-_(Empty on first generation. `/10x-archive` appends an entry here — and flips that item's `Status` to `done` — when a change whose `Change ID` matches the item is archived.)_
+- **S-02: koordynator może dodać pozycję potrzeby (nazwa, status pilności: pilne/potrzebne/mile widziane, potrzebna ilość, opcjonalny link do Allegro), edytować istniejącą pozycję i usunąć ją.** — Archived 2026-05-27 → `context/archive/2026-05-26-needs-management-panel/`. Lesson: —.

@@ -1,10 +1,10 @@
 ---
 change_id: needs-management-panel
 title: Coordinator adds, edits, and deletes needs
-status: implemented
+status: archived
 created: 2026-05-26
 updated: 2026-05-27
-archived_at: null
+archived_at: 2026-05-27T12:30:00Z
 ---
 
 ## Notes
