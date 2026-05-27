@@ -478,22 +478,22 @@ export default async function DashboardPage() {
 
 #### Automated
 
-- [ ] 1.1 `npx tsc --project tsconfig.app.json --noEmit` passes
-- [ ] 1.2 `npm run lint` passes
+- [x] 1.1 `npx tsc --project tsconfig.app.json --noEmit` passes
+- [x] 1.2 `npm run lint` passes
 
 ### Phase 2: NeedsPanel Component and Dashboard Integration
 
 #### Automated
 
-- [ ] 2.1 `npx tsc --project tsconfig.app.json --noEmit` passes
-- [ ] 2.2 `npm run lint` passes
+- [x] 2.1 `npx tsc --project tsconfig.app.json --noEmit` passes
+- [x] 2.2 `npm run lint` passes
 
 #### Manual
 
-- [ ] 2.3 `/dashboard` shows empty state when no needs
-- [ ] 2.4 Add need → appears in list sorted by urgency
-- [ ] 2.5 Edit need inline → item updates
-- [ ] 2.6 Delete need → item disappears
-- [ ] 2.7 Add form validation: empty name → error message
-- [ ] 2.8 Urgency badges show correct colors
-- [ ] 2.9 Allegro link appears as clickable link when provided
+- [x] 2.3 `/dashboard` shows empty state when no needs
+- [x] 2.4 Add need → appears in list sorted by urgency
+- [x] 2.5 Edit need inline → item updates
+- [x] 2.6 Delete need → item disappears
+- [x] 2.7 Add form validation: empty name → error message
+- [x] 2.8 Urgency badges show correct colors
+- [x] 2.9 Allegro link appears as clickable link when provided

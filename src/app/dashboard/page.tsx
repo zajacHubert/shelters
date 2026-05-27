@@ -1,15 +1,23 @@
 import { getSession } from '@/lib/auth/session';
 import { createServerClient } from '@/db/client';
 import { getShelterById } from '@/db/queries/shelters';
+import { getNeedsByShelter } from '@/db/queries/needs';
 import { logoutAction } from '@/app/actions/auth';
+import { NeedsPanel } from './needs-panel';
+import { unstable_noStore as noStore } from 'next/cache';
 import { redirect } from 'next/navigation';
 
 export default async function DashboardPage() {
+  noStore();
+
   const session = await getSession();
   if (!session) redirect('/login');
 
   const db = createServerClient();
-  const shelter = await getShelterById(db, session.shelterId);
+  const [shelter, needs] = await Promise.all([
+    getShelterById(db, session.shelterId),
+    getNeedsByShelter(db, session.shelterId),
+  ]);
 
   return (
     <main className='p-8 max-w-2xl mx-auto'>
@@ -24,7 +32,7 @@ export default async function DashboardPage() {
           </button>
         </form>
       </div>
-      <p className='text-gray-600'>Panel zarządzania potrzebami — wkrótce.</p>
+      <NeedsPanel needs={needs} />
     </main>
   );
 }
