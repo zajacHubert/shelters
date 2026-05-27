@@ -1,10 +1,10 @@
 ---
 change_id: auth-scaffold
 title: Auth scaffold: email+password registration, login, session, route protection
-status: implemented
+status: archived
 created: 2026-05-26
-updated: 2026-05-26
-archived_at: null
+updated: 2026-05-27
+archived_at: 2026-05-27T12:40:00Z
 ---
 
 ## Notes

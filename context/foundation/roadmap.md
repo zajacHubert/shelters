@@ -25,13 +25,13 @@ Schroniska nie mają prostego kanału do komunikowania aktualnych potrzeb zaopat
 
 ## At a glance
 
-| ID   | Change ID                      | Outcome (user can …)                                                                                                          | Prerequisites | PRD refs                                                                     | Status   |
-| ---- | ------------------------------ | ----------------------------------------------------------------------------------------------------------------------------- | ------------- | ---------------------------------------------------------------------------- | -------- |
-| F-01 | data-layer-foundation          | (fundament) warstwa danych gotowa: schemat tabel schronisk i potrzeb, migracje, izolacja per schronisko                       | —             | NFR (izolacja per schronisko, hasła nie w plaintext)                         | ready    |
-| F-02 | auth-scaffold                  | (fundament) autentykacja e-mail+hasło działa: rejestracja z hashowaniem hasła, sesja, ochrona tras panelu koordynatora        | F-01          | FR-001, FR-002, FR-003, NFR (hasła nie w plaintext, izolacja per schronisko) | proposed |
-| S-01 | shelter-registration-and-login | koordynator rejestruje schronisko i loguje się do panelu                                                                      | F-01, F-02    | FR-001, FR-002, FR-003, US-01                                                | proposed |
-| S-02 | needs-management-panel         | koordynator dodaje, edytuje i usuwa pozycje potrzeb z polami: nazwa, pilność, ilość, link do Allegro                          | S-01          | FR-004, FR-005, FR-006, US-01                                                | done     |
-| S-03 | donor-discovery-flow           | darczyńca przegląda schroniska po mieście, widzi potrzeby posortowane według pilności i klika link do Allegro — bez logowania | F-01          | FR-007, FR-008, FR-009, US-01                                                | done     |
+| ID   | Change ID                      | Outcome (user can …)                                                                                                          | Prerequisites | PRD refs                                                                     | Status |
+| ---- | ------------------------------ | ----------------------------------------------------------------------------------------------------------------------------- | ------------- | ---------------------------------------------------------------------------- | ------ |
+| F-01 | data-layer-foundation          | (fundament) warstwa danych gotowa: schemat tabel schronisk i potrzeb, migracje, izolacja per schronisko                       | —             | NFR (izolacja per schronisko, hasła nie w plaintext)                         | done   |
+| F-02 | auth-scaffold                  | (fundament) autentykacja e-mail+hasło działa: rejestracja z hashowaniem hasła, sesja, ochrona tras panelu koordynatora        | F-01          | FR-001, FR-002, FR-003, NFR (hasła nie w plaintext, izolacja per schronisko) | done   |
+| S-01 | shelter-registration-and-login | koordynator rejestruje schronisko i loguje się do panelu                                                                      | F-01, F-02    | FR-001, FR-002, FR-003, US-01                                                | done   |
+| S-02 | needs-management-panel         | koordynator dodaje, edytuje i usuwa pozycje potrzeb z polami: nazwa, pilność, ilość, link do Allegro                          | S-01          | FR-004, FR-005, FR-006, US-01                                                | done   |
+| S-03 | donor-discovery-flow           | darczyńca przegląda schroniska po mieście, widzi potrzeby posortowane według pilności i klika link do Allegro — bez logowania | F-01          | FR-007, FR-008, FR-009, US-01                                                | done   |
 
 ## Streams
 
@@ -67,7 +67,7 @@ Fundament poniżej zakłada, że te warstwy są obecne i ich NIE przebudowuje.
 - **Blockers:** —
 - **Unknowns:** Który DB kompatybilny z Cloudflare Workers wybrać (Cloudflare D1, Supabase/PostgreSQL przez HTTP, Turso/libSQL)? — Owner: developer. Block: no.
 - **Risk:** Cloudflare Workers nie wspiera połączeń TCP — wybór DB musi być HTTP-kompatybilny lub natywny dla Workers; nieprawidłowy wybór tutaj blokuje cały stos danych.
-- **Status:** ready
+- **Status:** done
 
 ### F-02: Szkielet autentykacji
 
@@ -94,7 +94,7 @@ Fundament poniżej zakłada, że te warstwy są obecne i ich NIE przebudowuje.
 - **Blockers:** —
 - **Unknowns:** —
 - **Risk:** UX formularza rejestracji decyduje o guardrailu "koordynator rejestruje schronisko w <5 minut" (PRD §Guardrails) — zbyt skomplikowany formularz blokuje wtórne kryterium sukcesu i zniechęca non-tech koordynatorów.
-- **Status:** proposed
+- **Status:** done
 
 ### S-02: Panel zarządzania potrzebami
 
@@ -106,7 +106,7 @@ Fundament poniżej zakłada, że te warstwy są obecne i ich NIE przebudowuje.
 - **Blockers:** —
 - **Unknowns:** —
 - **Risk:** Pole pilności jest subiektywne i ustawiane przez koordynatora (PRD §Business Logic — świadoma decyzja projektowa); prawidłowe sortowanie w S-03 zależy od dyscypliny koordynatora, nie od walidacji aplikacji.
-- **Status:** proposed
+- **Status:** done
 
 ### S-03: Widok publiczny dla darczyńcy
 
@@ -147,5 +147,8 @@ _(Brak otwartych pytań na poziomie roadmapy. PRD miał 0 otwartych pytań; decy
 
 ## Done
 
+- **F-01: (fundament) warstwa danych gotowa: schemat tabel `shelters` i `needs` z polami wymaganymi przez PRD, migracje, izolacja per schronisko wyegzekwowana na poziomie zapytań — baza osiągalna z Cloudflare Workers runtime.** — Archived 2026-05-27 → `context/archive/2026-05-26-data-layer-foundation/`. Lesson: —.
+- **F-02: (fundament) autentykacja e-mail+hasło działa: rejestracja z hashowaniem hasła, logowanie, zarządzanie sesją, ochrona tras panelu koordynatora — izolacja per schronisko wyegzekwowana przez middleware sesji.** — Archived 2026-05-27 → `context/archive/2026-05-26-auth-scaffold/`. Lesson: —.
+- **S-01: koordynator może zarejestrować schronisko podając nazwę, miasto, e-mail i hasło; zalogować się do panelu; i wylogować.** — Archived 2026-05-27 → `context/archive/2026-05-26-shelter-registration-and-login/`. Lesson: —.
 - **S-02: koordynator może dodać pozycję potrzeby (nazwa, status pilności: pilne/potrzebne/mile widziane, potrzebna ilość, opcjonalny link do Allegro), edytować istniejącą pozycję i usunąć ją.** — Archived 2026-05-27 → `context/archive/2026-05-26-needs-management-panel/`. Lesson: —.
 - **S-03: darczyńca może przeglądać listę schronisk filtrowaną po mieście (bez logowania), wejść na stronę schroniska, zobaczyć potrzeby posortowane według pilności (pilne → potrzebne → mile widziane) i kliknąć "Kup na Allegro →" otwierający Allegro w nowej karcie.** — Archived 2026-05-27 → `context/archive/2026-05-27-donor-discovery-flow/`. Lesson: —.

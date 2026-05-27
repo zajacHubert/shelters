@@ -1,10 +1,10 @@
 ---
 change_id: shelter-registration-and-login
 title: Coordinator registers a shelter and logs in to the panel
-status: implemented
+status: archived
 created: 2026-05-26
-updated: 2026-05-26
-archived_at: null
+updated: 2026-05-27
+archived_at: 2026-05-27T12:40:00Z
 ---
 
 ## Notes

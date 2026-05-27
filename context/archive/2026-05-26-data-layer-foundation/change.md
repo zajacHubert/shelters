@@ -1,10 +1,10 @@
 ---
 change_id: data-layer-foundation
 title: Data layer foundation: shelters and needs schema, migrations, Workers-compatible DB
-status: implementing
+status: archived
 created: 2026-05-26
-updated: 2026-05-26
-archived_at: null
+updated: 2026-05-27
+archived_at: 2026-05-27T12:40:00Z
 ---
 
 ## Notes
