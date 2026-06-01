@@ -6,17 +6,20 @@
  *
  * Requires `bun run build:binary` to have been run first.
  */
-import { describe, it, expect, beforeAll } from "bun:test";
-import { existsSync } from "node:fs";
-import { tmpdir } from "node:os";
-import { resolve } from "node:path";
+import { describe, it, expect, beforeAll } from 'bun:test';
+import { existsSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import { resolve } from 'node:path';
 
-const BINARY_NAME = process.platform === "win32" ? "10x.exe" : "10x";
-const BINARY_PATH = resolve(import.meta.dir, "../../dist", BINARY_NAME);
+const describeSmoke =
+  process.env['RUN_SMOKE_TESTS'] === '1' ? describe : describe.skip;
+
+const BINARY_NAME = process.platform === 'win32' ? '10x.exe' : '10x';
+const BINARY_PATH = resolve(import.meta.dir, '../../dist', BINARY_NAME);
 
 const binaryExists = existsSync(BINARY_PATH);
 
-describe("compiled binary", () => {
+describeSmoke('compiled binary', () => {
   beforeAll(() => {
     if (!binaryExists) {
       console.warn(
@@ -25,16 +28,16 @@ describe("compiled binary", () => {
     }
   });
 
-  it("binary exists after build:binary", () => {
+  it('binary exists after build:binary', () => {
     expect(binaryExists).toBe(true);
   });
 
-  it("runs --version with exit code 0", async () => {
+  it('runs --version with exit code 0', async () => {
     if (!binaryExists) return;
-    const proc = Bun.spawnSync([BINARY_PATH, "--version"], {
-      stdout: "pipe",
-      stderr: "pipe",
-      env: { ...process.env, NO_COLOR: "1" },
+    const proc = Bun.spawnSync([BINARY_PATH, '--version'], {
+      stdout: 'pipe',
+      stderr: 'pipe',
+      env: { ...process.env, NO_COLOR: '1' },
     });
     expect(proc.exitCode).toBe(0);
     const stdout = proc.stdout.toString().trim();
@@ -43,44 +46,45 @@ describe("compiled binary", () => {
     expect(stdout).toMatch(/\d+\.\d+\.\d+/);
   });
 
-  it("runs --help with exit code 0", async () => {
+  it('runs --help with exit code 0', async () => {
     if (!binaryExists) return;
-    const proc = Bun.spawnSync([BINARY_PATH, "--help"], {
-      stdout: "pipe",
-      stderr: "pipe",
-      env: { ...process.env, NO_COLOR: "1" },
+    const proc = Bun.spawnSync([BINARY_PATH, '--help'], {
+      stdout: 'pipe',
+      stderr: 'pipe',
+      env: { ...process.env, NO_COLOR: '1' },
     });
     expect(proc.exitCode).toBe(0);
     const output = proc.stdout.toString() + proc.stderr.toString();
     expect(output.length).toBeGreaterThan(0);
   });
 
-  it("bundles dependencies — runs without node_modules", async () => {
+  it('bundles dependencies — runs without node_modules', async () => {
     if (!binaryExists) return;
     const isolatedDir = tmpdir();
-    const homeEnv = process.platform === "win32"
-      ? { USERPROFILE: isolatedDir }
-      : { HOME: isolatedDir };
-    const proc = Bun.spawnSync([BINARY_PATH, "--version"], {
-      stdout: "pipe",
-      stderr: "pipe",
+    const homeEnv =
+      process.platform === 'win32'
+        ? { USERPROFILE: isolatedDir }
+        : { HOME: isolatedDir };
+    const proc = Bun.spawnSync([BINARY_PATH, '--version'], {
+      stdout: 'pipe',
+      stderr: 'pipe',
       cwd: isolatedDir,
-      env: { ...homeEnv, NO_COLOR: "1" },
+      env: { ...homeEnv, NO_COLOR: '1' },
     });
     expect(proc.exitCode).toBe(0);
   });
 
-  it("starts within 50ms budget", async () => {
+  it('starts within 50ms budget', async () => {
     if (!binaryExists) return;
     const runs = 5;
     const times: number[] = [];
 
     for (let i = 0; i < runs; i++) {
       const start = performance.now();
-      Bun.spawnSync([BINARY_PATH, "--version"], {
-        stdout: "pipe",
-        stderr: "pipe",
-        env: { ...process.env, NO_COLOR: "1" },
+      Bun.spawnSync([BINARY_PATH, '--version'], {
+        stdout: 'pipe',
+        stderr: 'pipe',
+        env: { ...process.env, NO_COLOR: '1' },
       });
       times.push(performance.now() - start);
     }
@@ -90,7 +94,7 @@ describe("compiled binary", () => {
     const avg = warm.reduce((a, b) => a + b, 0) / warm.length;
 
     // 50ms on unix, 150ms on Windows CI (slower process spawn)
-    const budget = process.platform === "win32" ? 150 : 50;
+    const budget = process.platform === 'win32' ? 150 : 50;
     expect(avg).toBeLessThan(budget);
   });
 });

@@ -1,56 +1,67 @@
-import { describe, expect, it } from "bun:test";
-import { join } from "node:path";
-import { ExitCodes, resolveContext } from "../src/lib/output";
-import { authFilePath, configDir } from "../src/lib/config";
-import { DEFAULT_API_BASE, resolveApiBase } from "../src/lib/api-client";
+import { describe, expect, it } from 'bun:test';
+import { join } from 'node:path';
+import { ExitCodes, resolveContext } from '../src/lib/output';
+import { authFilePath, configDir } from '../src/lib/config';
+import { DEFAULT_API_BASE, resolveApiBase } from '../src/lib/api-client';
 
-describe("output", () => {
-  it("exposes semantic exit codes", () => {
+describe('output', () => {
+  it('exposes semantic exit codes', () => {
     expect(ExitCodes.SUCCESS).toBe(0);
     expect(ExitCodes.AUTH_REQUIRED).toBe(3);
     expect(ExitCodes.FORBIDDEN).toBe(4);
     expect(ExitCodes.NOT_FOUND).toBe(5);
   });
 
-  it("forces json mode when stdout is not a TTY", () => {
-    const ctx = resolveContext({ json: false });
-    // bun test pipes stdout, so isTTY is falsy — json mode should be implicit.
-    expect(ctx.json).toBe(true);
+  it('forces json mode when stdout is not a TTY', () => {
+    const prior = process.stdout.isTTY;
+    Object.defineProperty(process.stdout, 'isTTY', {
+      value: false,
+      configurable: true,
+    });
+    try {
+      const ctx = resolveContext({ json: false });
+      expect(ctx.json).toBe(true);
+    } finally {
+      Object.defineProperty(process.stdout, 'isTTY', {
+        value: prior,
+        configurable: true,
+      });
+    }
   });
 
-  it("honors explicit --json flag", () => {
+  it('honors explicit --json flag', () => {
     const ctx = resolveContext({ json: true });
     expect(ctx.json).toBe(true);
   });
 });
 
-describe("config paths", () => {
-  it("resolves a config directory under the user home", () => {
+describe('config paths', () => {
+  it('resolves a config directory under the user home', () => {
     const dir = configDir();
-    expect(dir).toContain("10x-cli");
-    expect(authFilePath()).toBe(join(dir, "auth.json"));
+    expect(dir).toContain('10x-cli');
+    expect(authFilePath()).toBe(join(dir, 'auth.json'));
   });
 });
 
-describe("api client", () => {
-  it("defaults to the production workers.dev host", () => {
-    const prior = process.env["API_BASE_URL"];
-    delete process.env["API_BASE_URL"];
+describe('api client', () => {
+  it('defaults to the production workers.dev host', () => {
+    const prior = process.env['API_BASE_URL'];
+    delete process.env['API_BASE_URL'];
     try {
       expect(resolveApiBase()).toBe(DEFAULT_API_BASE);
     } finally {
-      if (prior !== undefined) process.env["API_BASE_URL"] = prior;
+      if (prior !== undefined) process.env['API_BASE_URL'] = prior;
     }
   });
 
-  it("honors API_BASE_URL override", () => {
-    const prior = process.env["API_BASE_URL"];
-    process.env["API_BASE_URL"] = "http://localhost:8787";
+  it('honors API_BASE_URL override', () => {
+    const prior = process.env['API_BASE_URL'];
+    process.env['API_BASE_URL'] = 'http://localhost:8787';
     try {
-      expect(resolveApiBase()).toBe("http://localhost:8787");
+      expect(resolveApiBase()).toBe('http://localhost:8787');
     } finally {
-      if (prior === undefined) delete process.env["API_BASE_URL"];
-      else process.env["API_BASE_URL"] = prior;
+      if (prior === undefined) delete process.env['API_BASE_URL'];
+      else process.env['API_BASE_URL'] = prior;
     }
   });
 });

@@ -4,55 +4,68 @@
  * Verifies the published package contains the right files, excludes
  * sensitive content, and targets the correct registry.
  */
-import { describe, it, expect } from "bun:test";
-import { execSync } from "node:child_process";
-import { readFileSync, writeFileSync, copyFileSync, appendFileSync, mkdtempSync, mkdirSync, rmSync } from "node:fs";
-import { tmpdir } from "node:os";
-import { join, resolve } from "node:path";
+import { describe, it, expect } from 'bun:test';
+import { execSync } from 'node:child_process';
+import {
+  readFileSync,
+  writeFileSync,
+  copyFileSync,
+  appendFileSync,
+  mkdtempSync,
+  mkdirSync,
+  rmSync,
+} from 'node:fs';
+import { tmpdir } from 'node:os';
+import { join, resolve } from 'node:path';
 
-const ROOT = resolve(import.meta.dir, "../..");
+const describeSmoke =
+  process.env['RUN_SMOKE_TESTS'] === '1' ? describe : describe.skip;
 
-describe("npm pack contents", () => {
-  it.skipIf(process.platform === "win32")("includes required files and excludes dev artifacts", () => {
-    const output = execSync("npm pack --dry-run --json", {
-      cwd: ROOT,
-      encoding: "utf8",
-      stdio: ["pipe", "pipe", "pipe"],
-    });
-    const [pack] = JSON.parse(output);
-    const filePaths = pack.files.map(
-      (f: { path: string }) => f.path,
-    ) as string[];
+const ROOT = resolve(import.meta.dir, '../..');
 
-    // Must include
-    expect(filePaths.some((f: string) => f.startsWith("dist/"))).toBe(true);
-    expect(filePaths).toContain("package.json");
-    expect(filePaths).toContain("README.md");
+describeSmoke('npm pack contents', () => {
+  it.skipIf(process.platform === 'win32')(
+    'includes required files and excludes dev artifacts',
+    () => {
+      const output = execSync('npm pack --dry-run --json', {
+        cwd: ROOT,
+        encoding: 'utf8',
+        stdio: ['pipe', 'pipe', 'pipe'],
+      });
+      const [pack] = JSON.parse(output);
+      const filePaths = pack.files.map(
+        (f: { path: string }) => f.path,
+      ) as string[];
 
-    // Must NOT include
-    const forbidden = ["src/", "test/", "tests/", ".env", "node_modules/"];
-    for (const prefix of forbidden) {
-      const leaked = filePaths.filter((f: string) => f.startsWith(prefix));
-      expect(leaked).toEqual([]);
-    }
+      // Must include
+      expect(filePaths.some((f: string) => f.startsWith('dist/'))).toBe(true);
+      expect(filePaths).toContain('package.json');
+      expect(filePaths).toContain('README.md');
 
-    // No secret-like files
-    const secrets = filePaths.filter((f: string) =>
-      /secret/i.test(f),
-    );
-    expect(secrets).toEqual([]);
-  }, 30_000);
+      // Must NOT include
+      const forbidden = ['src/', 'test/', 'tests/', '.env', 'node_modules/'];
+      for (const prefix of forbidden) {
+        const leaked = filePaths.filter((f: string) => f.startsWith(prefix));
+        expect(leaked).toEqual([]);
+      }
+
+      // No secret-like files
+      const secrets = filePaths.filter((f: string) => /secret/i.test(f));
+      expect(secrets).toEqual([]);
+    },
+    30_000,
+  );
 });
 
-describe("registry target", () => {
-  it(".npmrc resolves to registry.npmjs.org, not GitHub Packages", () => {
-    const npmrc = readFileSync(resolve(ROOT, ".npmrc"), "utf8");
-    expect(npmrc).toContain("registry=https://registry.npmjs.org/");
-    expect(npmrc).not.toContain("npm.pkg.github.com");
+describeSmoke('registry target', () => {
+  it('.npmrc resolves to registry.npmjs.org, not GitHub Packages', () => {
+    const npmrc = readFileSync(resolve(ROOT, '.npmrc'), 'utf8');
+    expect(npmrc).toContain('registry=https://registry.npmjs.org/');
+    expect(npmrc).not.toContain('npm.pkg.github.com');
   });
 });
 
-describe("auto-version script", () => {
+describeSmoke('auto-version script', () => {
   /**
    * Helper: creates a temp git repo, runs auto-version.mjs, returns
    * { stdout, stderr, exitCode, packageJson }.
@@ -63,56 +76,57 @@ describe("auto-version script", () => {
     exitCode: number;
     packageJson: string;
   } {
-    const tmpDir = mkdtempSync(join(tmpdir(), "10x-autoversion-"));
+    const tmpDir = mkdtempSync(join(tmpdir(), '10x-autoversion-'));
 
     try {
       // Write files via Node.js to avoid shell quoting issues on Windows.
-      writeFileSync(join(tmpDir, "package.json"), '{"version":"1.0.0"}');
-      mkdirSync(join(tmpDir, "src"), { recursive: true });
-      writeFileSync(join(tmpDir, "src/index.ts"), "// placeholder\n");
+      writeFileSync(join(tmpDir, 'package.json'), '{"version":"1.0.0"}');
+      mkdirSync(join(tmpDir, 'src'), { recursive: true });
+      writeFileSync(join(tmpDir, 'src/index.ts'), '// placeholder\n');
 
       // Initialize repo with a v1.0.0 tag.
       execSync(
         [
-          "git init -q",
+          'git init -q',
           'git config user.name "test"',
           'git config user.email "test@test.com"',
-          "git add -A",
+          'git add -A',
           'git commit -m "initial" -q',
-          "git tag v1.0.0",
-        ].join(" && "),
-        { cwd: tmpDir, stdio: "pipe" },
+          'git tag v1.0.0',
+        ].join(' && '),
+        { cwd: tmpDir, stdio: 'pipe' },
       );
 
       // Add commits that touch src/ so the git-diff release gate fires.
       for (const msg of commits) {
-        appendFileSync(join(tmpDir, "src/index.ts"), "// change\n");
+        appendFileSync(join(tmpDir, 'src/index.ts'), '// change\n');
         execSync(`git add -A && git commit -m "${msg}" -q`, {
           cwd: tmpDir,
-          stdio: "pipe",
+          stdio: 'pipe',
         });
       }
 
       copyFileSync(
-        join(ROOT, "scripts/auto-version.mjs"),
-        join(tmpDir, "auto-version.mjs"),
+        join(ROOT, 'scripts/auto-version.mjs'),
+        join(tmpDir, 'auto-version.mjs'),
       );
 
-      const homeEnv = process.platform === "win32"
-        ? { USERPROFILE: tmpDir }
-        : { HOME: tmpDir };
-      const proc = Bun.spawnSync(["bun", "auto-version.mjs"], {
+      const homeEnv =
+        process.platform === 'win32'
+          ? { USERPROFILE: tmpDir }
+          : { HOME: tmpDir };
+      const proc = Bun.spawnSync(['bun', 'auto-version.mjs'], {
         cwd: tmpDir,
-        stdout: "pipe",
-        stderr: "pipe",
+        stdout: 'pipe',
+        stderr: 'pipe',
         env: { ...process.env, ...homeEnv, NODE_PATH: `${ROOT}/node_modules` },
       });
 
       const pkgContent = (() => {
         try {
-          return readFileSync(`${tmpDir}/package.json`, "utf8");
+          return readFileSync(`${tmpDir}/package.json`, 'utf8');
         } catch {
-          return "";
+          return '';
         }
       })();
 
@@ -127,16 +141,16 @@ describe("auto-version script", () => {
     }
   }
 
-  it("exits with code 1 when no releasable commits exist", () => {
-    const result = runAutoVersion(["chore(release): v1.0.0"]);
+  it('exits with code 1 when no releasable commits exist', () => {
+    const result = runAutoVersion(['chore(release): v1.0.0']);
     expect(result.exitCode).toBe(1);
-    expect(result.stderr).toContain("No version bump needed");
+    expect(result.stderr).toContain('No version bump needed');
   });
 
-  it("bumps minor for feat: commits", () => {
-    const result = runAutoVersion(["feat: add new command"]);
+  it('bumps minor for feat: commits', () => {
+    const result = runAutoVersion(['feat: add new command']);
     expect(result.exitCode).toBe(0);
     expect(result.packageJson).toContain('"version": "1.1.0"');
-    expect(result.stdout).toContain("NEW_VERSION=v1.1.0");
+    expect(result.stdout).toContain('NEW_VERSION=v1.1.0');
   });
 });

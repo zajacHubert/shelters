@@ -21,7 +21,7 @@ API calls return `ApiResult<T>` — always branch on `ok`. Exit codes are semant
 - `src/commands/` — one file per command, each exports `register<Name>Command(cli)`. Use `@src/commands/doctor.ts` as the reference shape.
 - `src/lib/` — `api-client`, `config`, `output`, `auth-flow`, `signing`, and other shared modules.
 - `src/generated/` — auto-generated; excluded from oxlint; never hand-edit.
-- `tests/` — unit + integration; `tests/e2e/` and `tests/smoke/` are separate tiers requiring a built binary.
+- `tests/` — unit + integration; `tests/smoke/` is a separate tier requiring a built binary.
 - `context/` — lesson-chain metadata; never modified by scaffolding or automation.
 
 To add a command: create `src/commands/<name>.ts`, export `register<Name>Command(cli)`, import and call it in `src/index.ts`.
@@ -45,4 +45,4 @@ No test framework configured for the Next.js app yet. The `tests/` directory con
 
 ## Commits and CI
 
-Conventional Commits: `feat(scope):`, `fix(scope):`, `chore(release):`, `test(scope):`, `ci:`. Scope = command or module name (`get`, `auth`, `api-client`). CI gate: typecheck → lint → test → build → binary → smoke → e2e — see `@.github/workflows/ci.yml`. Runs on every PR and push to `main`/`master`.
+Conventional Commits: `feat(scope):`, `fix(scope):`, `chore(release):`, `test(scope):`, `ci:`. Scope = command or module name (`get`, `auth`, `api-client`). CI gate: typecheck → lint → test → build → binary → smoke — see `@.github/workflows/ci.yml`. Runs on every PR and push to `main`/`master`.
