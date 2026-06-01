@@ -73,9 +73,13 @@ export function resolveContext(flags: GlobalFlags): OutputContext {
   };
 }
 
-export function output(ctx: OutputContext, humanMessage: string, data: unknown): void {
+export function output(
+  ctx: OutputContext,
+  humanMessage: string,
+  data: unknown,
+): void {
   if (ctx.json) {
-    process.stdout.write(`${JSON.stringify({ status: "ok", data })}\n`);
+    process.stdout.write(`${JSON.stringify({ status: 'ok', data })}\n`);
     return;
   }
   if (humanMessage) {
@@ -95,7 +99,7 @@ export function outputError(
     // needed. Preserve the raw strings so JSON consumers can see exactly what
     // the API returned if they want to debug.
     process.stdout.write(
-      `${JSON.stringify({ status: "error", error: { code, message, hint } })}\n`,
+      `${JSON.stringify({ status: 'error', error: { code, message, hint } })}\n`,
     );
   } else {
     // Human stderr path: the message/hint may contain text interpolated from
@@ -119,11 +123,13 @@ export function outputError(
  * Exported for tests only. Production callers go through `outputError`.
  */
 export function sanitize(s: string): string {
-  return s
-    // CSI: ESC [ <params> <intermediates> <final>
-    .replace(/\x1b\[[0-?]*[ -/]*[@-~]/g, "")
-    // All remaining C0 + C1 control characters (including bare ESC / BEL).
-    .replace(/[\u0000-\u001F\u007F-\u009F]/g, "");
+  return (
+    s
+      // CSI: ESC [ <params> <intermediates> <final>
+      .replace(/\x1b\[[0-?]*[ -/]*[@-~]/g, '')
+      // All remaining C0 + C1 control characters (including bare ESC / BEL).
+      .replace(/[\u0000-\u001F\u007F-\u009F]/g, '')
+  );
 }
 
 export function verbose(ctx: OutputContext, message: string): void {
@@ -144,9 +150,9 @@ export function exitNotImplemented(
   const ctx = resolveContext(flags);
   outputError(
     ctx,
-    "not_implemented",
+    'not_implemented',
     `'10x ${command}' lands in ${phase}.`,
     ExitCodes.ERROR,
-    "See thoughts/shared/plans/2026-04-07-10x-cli-design.md for the full roadmap.",
+    'See thoughts/shared/plans/2026-04-07-10x-cli-design.md for the full roadmap.',
   );
 }

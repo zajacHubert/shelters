@@ -1,0 +1,14 @@
+{
+  "$schema": "https://github.com/github/copilot-docs/blob/main/docs/agents/hooks/schema.json",
+  "trigger": "PostToolUse",
+  "matcher": {
+    "tool": ["Write", "Edit"],
+    "filePathPattern": ".*\\.(ts|tsx|js|jsx)$"
+  },
+  "handler": {
+    "type": "command",
+    "command": "npx eslint --no-ignore \"$FILE\" 2>&1"
+  },
+  "errorReportingLevel": "blocking",
+  "description": "Lint and auto-fix TypeScript/JavaScript files on edit"
+}

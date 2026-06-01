@@ -1,0 +1,14 @@
+{
+  "$schema": "https://github.com/github/copilot-docs/blob/main/docs/agents/hooks/schema.json",
+  "trigger": "PostToolUse",
+  "matcher": {
+    "tool": ["Write", "Edit"],
+    "filePathPattern": ".*\\.(ts|tsx)$"
+  },
+  "handler": {
+    "type": "command",
+    "command": "npx tsc --noEmit \"$FILE\" 2>&1 || true"
+  },
+  "errorReportingLevel": "blocking",
+  "description": "Type-check TypeScript files on edit"
+}

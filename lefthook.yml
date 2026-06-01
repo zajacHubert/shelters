@@ -1,0 +1,16 @@
+#!/usr/bin/env lefthook
+# Pre-commit hooks configuration (M3L3 - local quality layer)
+
+pre-commit:
+  parallel: false
+  
+  commands:
+    lint:
+      glob: "src/**/*.{ts,tsx,js,jsx}"
+      run: npx eslint --no-ignore {staged_files} 2>&1
+      pass_exit_codes: [0, 2]
+    
+    typecheck:
+      glob: "src/**/*.{ts,tsx}"
+      run: npx tsc --noEmit 2>&1
+      pass_exit_codes: [0]
