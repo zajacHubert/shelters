@@ -19,7 +19,7 @@ jobs:
       # Pinned by SHA to prevent tag-swapping supply chain attacks.
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd  # v4
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v5
         with:
           node-version: "22"
           cache: "npm"
