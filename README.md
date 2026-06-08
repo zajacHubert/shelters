@@ -1,3 +1,11 @@
+# ShelterNeeds
+
+Aplikacja webowa łącząca schroniska ze swoimi darczyńcami. Schronisko publikuje listę aktualnych potrzeb, darczyńca znajduje schronisko w swoim mieście i klika "kup na Allegro" — bez zakładania konta.
+
+**Środowisko testowe:** https://shelter-needs.shelters-test.workers.dev/
+
+---
+
 # 10x-cli
 
 CLI tool for [10xDevs](https://10xdevs.pl) course content. Fetch and apply AI coding skills,
