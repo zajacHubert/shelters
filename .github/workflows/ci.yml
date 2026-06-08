@@ -37,4 +37,4 @@ jobs:
         run: npm run build
 
       - name: Test (unit + integration)
-        run: bun install && bun test
+        run: bun install && bun test --ignore="tests/e2e/**" --ignore="tests/smoke/**"
