@@ -28,12 +28,14 @@ To add a command: create `src/commands/<name>.ts`, export `register<Name>Command
 
 ## Commands
 
-| Purpose                 | Command         |
-| ----------------------- | --------------- |
-| Start dev server        | `npm run dev`   |
-| Build for production    | `npm run build` |
-| Start production server | `npm run start` |
-| Lint                    | `npm run lint`  |
+| Purpose                 | Command              |
+| ----------------------- | -------------------- |
+| Start dev server        | `npm run dev`        |
+| Build for production    | `npm run build`      |
+| Start production server | `npm run start`      |
+| Lint                    | `npm run lint`       |
+| Apply DB migrations     | `npm run db:migrate` |
+| Seed development data   | `npm run db:seed`    |
 
 ## TypeScript and style
 
@@ -41,7 +43,7 @@ To add a command: create `src/commands/<name>.ts`, export `register<Name>Command
 
 ## Testing
 
-No test framework configured for the Next.js app yet. The `tests/` directory contains the 10x-cli source tests (bun:test); run those with `bun test` directly if needed. To add tests for the Next.js app, install Vitest or Jest with `@testing-library/react`.
+Test runner for the app layer: `bun:test`. Tests live in `tests/`. App-layer unit tests (`tests/shelter-actions.test.ts`, `tests/output.test.ts`, etc.) use `mock.module()` from `bun:test`. Integration tests live in `tests/integration/` and are gated by `RUN_INTEGRATION_TESTS=1`. Run unit tests with `npm run test:unit` (`bun test`). Fixtures live in `tests/integration/donor-flow/support/fixtures.ts`.
 
 ## Commits and CI
 

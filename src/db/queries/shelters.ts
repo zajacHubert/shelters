@@ -13,7 +13,20 @@ export async function getSheltersByCity(
     .select('*')
     .eq('city', city.toLowerCase());
   if (error) throw error;
-  return data ?? [];
+  if (!data || data.length === 0) return [];
+
+  // Only show shelters that have at least one need listed
+  const ids = data.map((s) => s.id);
+  const { data: needsRows, error: needsError } = await db
+    .from('needs')
+    .select('shelter_id')
+    .in('shelter_id', ids);
+  if (needsError) throw needsError;
+
+  const shelterIdsWithNeeds = new Set(
+    (needsRows ?? []).map((n) => n.shelter_id),
+  );
+  return data.filter((s) => shelterIdsWithNeeds.has(s.id));
 }
 
 export async function getShelterByEmail(
@@ -53,4 +66,28 @@ export async function createShelter(
     .single();
   if (error) throw error;
   return data;
+}
+
+export async function updateShelter(
+  db: Db,
+  id: string,
+  changes: Partial<
+    Pick<NewShelter, 'name' | 'city' | 'email' | 'password_hash'>
+  >,
+): Promise<Shelter> {
+  const patch = { ...changes };
+  if (patch.city !== undefined) patch.city = patch.city.toLowerCase();
+  const { data, error } = await db
+    .from('shelters')
+    .update(patch)
+    .eq('id', id)
+    .select()
+    .single();
+  if (error) throw error;
+  return data;
+}
+
+export async function deleteShelter(db: Db, id: string): Promise<void> {
+  const { error } = await db.from('shelters').delete().eq('id', id);
+  if (error) throw error;
 }

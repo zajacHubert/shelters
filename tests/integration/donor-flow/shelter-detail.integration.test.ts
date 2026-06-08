@@ -1,5 +1,9 @@
 import { beforeEach, describe, expect, it, mock } from 'bun:test';
 import { renderToStaticMarkup } from 'react-dom/server';
+import {
+  donorFixtureKnownShelter,
+  needsFixtureSingleUrgent,
+} from './support/fixtures';
 
 beforeEach(() => {
   mock.module('next/cache', () => ({
@@ -11,10 +15,7 @@ beforeEach(() => {
   }));
 });
 
-const describeIntegration =
-  process.env['RUN_INTEGRATION_TESTS'] === '1' ? describe : describe.skip;
-
-describeIntegration('donor shelter detail route integration contract', () => {
+describe('donor shelter detail route integration contract', () => {
   it('renders shelter detail with needs for valid shelter id', async () => {
     mock.module('next/navigation', () => ({
       notFound: () => {
@@ -24,29 +25,19 @@ describeIntegration('donor shelter detail route integration contract', () => {
 
     mock.module('@/db/queries/shelters', () => ({
       getShelterById: async () => ({
-        id: '11111111-1111-1111-1111-111111111111',
+        id: donorFixtureKnownShelter.id,
         name: 'Schronisko Warszawa',
         city: 'warszawa',
       }),
     }));
 
     mock.module('@/db/queries/needs', () => ({
-      getNeedsByShelter: async () => [
-        {
-          id: 1,
-          shelter_id: '11111111-1111-1111-1111-111111111111',
-          name: 'Karma sucha',
-          urgency: 'pilne',
-          quantity: 5,
-          allegro_link: 'https://allegro.pl/oferta/karma-sucha',
-          created_at: new Date().toISOString(),
-        },
-      ],
+      getNeedsByShelter: async () => needsFixtureSingleUrgent,
     }));
 
     const pageModule = await import('../../../src/app/shelters/[id]/page');
     const element = await pageModule.default({
-      params: Promise.resolve({ id: '11111111-1111-1111-1111-111111111111' }),
+      params: Promise.resolve({ id: donorFixtureKnownShelter.id }),
     });
     const html = renderToStaticMarkup(element);
 

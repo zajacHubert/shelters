@@ -21,6 +21,42 @@ const URGENCY_COLOR: Record<Urgency, string> = {
   mile_widziane: 'bg-green-100 text-green-800',
 };
 
+function DeleteNeedButton({ needId }: { needId: number }) {
+  const [confirming, setConfirming] = useState(false);
+
+  if (!confirming) {
+    return (
+      <button
+        type='button'
+        onClick={() => setConfirming(true)}
+        className='btn-secondary text-xs px-2 py-1 text-red-600 hover:text-red-800'
+      >
+        Usuń
+      </button>
+    );
+  }
+
+  return (
+    <form action={deleteNeedAction} className='flex items-center gap-1'>
+      <input type='hidden' name='id' value={needId} />
+      <span className='text-xs text-red-600 font-medium'>Na pewno?</span>
+      <button
+        type='submit'
+        className='btn-secondary text-xs px-2 py-1 text-red-600 hover:text-red-800'
+      >
+        Tak
+      </button>
+      <button
+        type='button'
+        onClick={() => setConfirming(false)}
+        className='btn-secondary text-xs px-2 py-1'
+      >
+        Nie
+      </button>
+    </form>
+  );
+}
+
 function UrgencySelect({ defaultValue }: { defaultValue?: Urgency }) {
   return (
     <select
@@ -44,7 +80,7 @@ function AddNeedForm() {
   return (
     <form
       action={formAction}
-      className='space-y-3 border border-gray-200 rounded-md p-4'
+      className='space-y-3 border border-gray-200 rounded-md p-4 bg-white'
     >
       <h2 className='text-sm font-medium text-gray-700'>Dodaj potrzebę</h2>
       {state.error && (
@@ -197,15 +233,7 @@ export function NeedsPanel({ needs }: { needs: Need[] }) {
                 >
                   Edytuj
                 </button>
-                <form action={deleteNeedAction}>
-                  <input type='hidden' name='id' value={need.id} />
-                  <button
-                    type='submit'
-                    className='btn-secondary text-xs px-2 py-1 text-red-600 hover:text-red-800'
-                  >
-                    Usuń
-                  </button>
-                </form>
+                <DeleteNeedButton needId={need.id} />
               </div>
             </li>
           ),

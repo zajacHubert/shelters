@@ -10,10 +10,7 @@ beforeEach(() => {
   }));
 });
 
-const describeIntegration =
-  process.env['RUN_INTEGRATION_TESTS'] === '1' ? describe : describe.skip;
-
-describeIntegration('donor dependency failure contract', () => {
+describe('donor dependency failure contract', () => {
   it('fails fast when Supabase env configuration is missing', async () => {
     mock.module('@/db/client', () => ({
       createServerClient: () => {

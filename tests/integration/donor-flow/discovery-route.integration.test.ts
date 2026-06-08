@@ -26,10 +26,7 @@ beforeEach(() => {
   }));
 });
 
-const describeIntegration =
-  process.env['RUN_INTEGRATION_TESTS'] === '1' ? describe : describe.skip;
-
-describeIntegration('donor discovery route integration contract', () => {
+describe('donor discovery route integration contract', () => {
   it('renders no-city prompt when city query is absent', async () => {
     mock.module('@/db/queries/shelters', () => ({
       getSheltersByCity: async () => [],
@@ -42,7 +39,7 @@ describeIntegration('donor discovery route integration contract', () => {
     });
     const html = renderToStaticMarkup(element);
 
-    expect(html).toContain('Wpisz miasto, aby zobaczyc schroniska.');
+    expect(html).toContain('Wpisz miasto, aby zobaczyć schroniska.');
   });
 
   it('renders known-city results with shelter links', async () => {

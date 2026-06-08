@@ -27,7 +27,7 @@ export default async function Home({ searchParams }: HomeProps) {
       <section className='space-y-2'>
         <h1 className='text-3xl font-semibold'>ShelterNeeds</h1>
         <p className='text-gray-600'>
-          Znajdz schronisko po miescie i sprawdz aktualne potrzeby.
+          Znajdź schronisko po mieście i sprawdź aktualne potrzeby.
         </p>
       </section>
 
@@ -47,7 +47,7 @@ export default async function Home({ searchParams }: HomeProps) {
 
       {!city && (
         <p className='text-sm text-gray-500'>
-          Wpisz miasto, aby zobaczyc schroniska.
+          Wpisz miasto, aby zobaczyć schroniska.
         </p>
       )}
 

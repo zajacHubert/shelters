@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { unstable_noStore as noStore } from 'next/cache';
 import { createServerClient } from '@/db/client';
@@ -40,6 +41,15 @@ export default async function ShelterPage({ params }: ShelterPageProps) {
 
   return (
     <main className='mx-auto max-w-3xl p-8 space-y-6'>
+      <nav>
+        <Link
+          href={`/?city=${encodeURIComponent(shelter.city)}`}
+          className='inline-flex items-center gap-1 text-sm text-gray-500 hover:text-gray-800'
+        >
+          &#8592; Wróć do wyników ({shelter.city})
+        </Link>
+      </nav>
+
       <header className='space-y-1'>
         <h1 className='text-2xl font-semibold'>{shelter.name}</h1>
         <p className='text-sm text-gray-500'>{shelter.city}</p>
@@ -47,7 +57,7 @@ export default async function ShelterPage({ params }: ShelterPageProps) {
 
       {needs.length === 0 ? (
         <p className='text-sm text-gray-500'>
-          To schronisko nie dodalo jeszcze potrzeb.
+          To schronisko nie dodało jeszcze potrzeb.
         </p>
       ) : (
         <ul className='space-y-3'>

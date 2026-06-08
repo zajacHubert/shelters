@@ -12,10 +12,7 @@ import {
   donorFixtureWithShelters,
 } from './support/fixtures';
 
-const describeIntegration =
-  process.env['RUN_INTEGRATION_TESTS'] === '1' ? describe : describe.skip;
-
-describeIntegration('donor integration harness scaffold', () => {
+describe('donor integration harness scaffold', () => {
   it('creates context and validates status + body markers', async () => {
     const context = await createDonorTestContext();
 

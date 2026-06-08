@@ -10,11 +10,12 @@
     "test:unit": "bun test",
     "test:e2e": "playwright test tests/e2e --reporter=line",
     "test:all": "npm run test:unit && npm run test:e2e && npm run lint",
-    "preview": "opennextjs-cloudflare build && opennextjs-cloudflare preview",
+    "preview": "opennextjs-cloudflare build && dotenv -e .env.local -- opennextjs-cloudflare preview",
     "deploy": "opennextjs-cloudflare build && opennextjs-cloudflare deploy -- --keep-vars",
     "upload": "opennextjs-cloudflare build && opennextjs-cloudflare upload",
     "cf-typegen": "wrangler types --env-interface CloudflareEnv cloudflare-env.d.ts",
-    "db:migrate": "supabase db push --linked"
+    "db:migrate": "supabase db push --linked",
+    "db:seed": "supabase db query --linked --file supabase/seed.sql"
   },
   "dependencies": {
     "@clack/prompts": "^0.9.1",
@@ -34,6 +35,7 @@
     "@types/proper-lockfile": "^4.1.4",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "dotenv-cli": "^11.0.0",
     "eslint": "^9",
     "eslint-config-next": "15.5.18",
     "supabase": "^2.101.0",

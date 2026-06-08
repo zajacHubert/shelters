@@ -36,5 +36,5 @@ jobs:
       - name: Build (Next.js)
         run: npm run build
 
-      - name: Test (unit)
-        run: bun install && bun test tests/*.test.ts
+      - name: Test (unit + integration)
+        run: bun install && bun test

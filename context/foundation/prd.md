@@ -75,6 +75,7 @@ Insight: schroniska są małymi organizacjami bez zasobów IT — istniejące ro
 
 - FR-003: Koordynator może wylogować się z panelu. Priority: must-have
   > Socrates: Brak kontrargumentu — FR stoi.
+  > Socrates: Brak kontrargumentu — FR stoi.
 
 ### Zarządzanie potrzebami
 
@@ -87,6 +88,15 @@ Insight: schroniska są małymi organizacjami bez zasobów IT — istniejące ro
   > Socrates: Brak kontrargumentu — FR stoi.
 
 - FR-006: Koordynator może usunąć pozycję potrzeby. Priority: must-have
+  > Socrates: Brak kontrargumentu — FR stoi.
+
+### Zarządzanie kontem schroniska
+
+- FR-010: Koordynator może edytować dane schroniska (nazwa, miasto, adres e-mail, hasło). Zmiana wymaga potwierdzenia aktualnym hasłem. Priority: must-have
+
+  > Socrates: Kontrargument rozważony: "skoro e-mail to login, zmiana e-maila powinna wymagać weryfikacji poprzez wysyłkę linku". Rozwiązanie: utrzymane w MVP — potwierdzenie aktualnym hasłem jest wystarczającym guardrailem bez infrastruktury e-mail transakcyjnego.
+
+- FR-011: Koordynator może usunąć konto schroniska wraz ze wszystkimi powiązanymi potrzebami. Operacja wymaga potwierdzenia aktualnym hasłem i jest nieodwracalna. Priority: must-have
   > Socrates: Brak kontrargumentu — FR stoi.
 
 ### Widok publiczny

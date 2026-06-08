@@ -1,2 +1,2 @@
 [test]
-pathIgnorePatterns = ["tests/smoke/**", "tests/integration/**", "tests/e2e/**"]
+pathIgnorePatterns = ["tests/smoke/**", "tests/e2e/**"]

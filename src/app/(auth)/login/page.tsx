@@ -1,5 +1,6 @@
 'use client';
 
+import Link from 'next/link';
 import { useActionState } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { loginAction } from '@/app/actions/auth';
@@ -59,12 +60,12 @@ function LoginForm() {
       </button>
       <p className='text-sm text-center text-gray-600'>
         Nie masz konta?{' '}
-        <a
+        <Link
           href='/register'
           className='text-blue-600 underline hover:text-blue-800'
         >
           Zarejestruj schronisko
-        </a>
+        </Link>
       </p>
     </form>
   );

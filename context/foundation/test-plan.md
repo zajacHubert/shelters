@@ -41,15 +41,18 @@ Top failure scenarios, ordered by risk = impact × likelihood.
 | #4   | Valid session reaches dashboard; invalid/expired session is redirected and cannot access protected routes. | "Cookie presence means valid session."               | token validation behavior + middleware guard semantics                    | integration + focused e2e     | testing only successful login path                                     |
 | #5   | Migration path preserves read/write behavior and key records across schema changes.                        | "Migration ran without SQL error, so data is safe."  | migration ordering + rollback/verification checks + seed fixture behavior | integration + migration smoke | treating migration success exit code as sufficient proof               |
 | #6   | Invalid or malicious input is rejected/sanitized server-side and does not corrupt public rendering.        | "Client form constraints are enough validation."     | server validation boundary + persistence shape + public rendering impact  | integration                   | relying on browser-only validation                                     |
+| #7   | Coordinator updates/deletes only their own shelter; `shelterId` always comes from the session, not input.  | "Session is validated, therefore ownership is safe." | `updateShelterAction`/`deleteShelterAction` ownership boundary            | unit (action-level)           | mocking session at the wrong layer so ownership check is never hit     |
+| #7   | Coordinator can update/delete another shelter's account via IDOR in shelter update/delete actions.         | "Session is validated, therefore ownership is safe." | action ownership boundary + `shelterId` from session vs form payload      | unit (action-level)           | mocking session at the wrong layer so ownership check is never hit     |
 
 ## 3. Phased Rollout
 
-| #   | Phase name                    | Goal (one line)                                                                      | Risks covered | Test types                                   | Status      | Change folder |
-| --- | ----------------------------- | ------------------------------------------------------------------------------------ | ------------- | -------------------------------------------- | ----------- | ------------- |
-| 1   | Critical donor and auth paths | Defend business-critical anonymous donor access and session guard behavior first.    | #1, #4        | integration + focused e2e smoke              | not started | —             |
-| 2   | Isolation and data integrity  | Protect cross-shelter isolation and migration/data safety before more feature work.  | #3, #5, #6    | integration + migration smoke                | not started | —             |
-| 3   | Ordering and UI confidence    | Lock urgency ordering behavior and selective visual confidence on key donor screens. | #2, #1        | unit + integration + selective visual review | not started | —             |
-| 4   | Quality-gates wiring          | Wire and enforce the minimum CI floor for future regressions.                        | cross-cutting | lint/type/test gates                         | not started | —             |
+| #   | Phase name                    | Goal (one line)                                                                      | Risks covered | Test types                                   | Status      | Change folder                   |
+| --- | ----------------------------- | ------------------------------------------------------------------------------------ | ------------- | -------------------------------------------- | ----------- | ------------------------------- |
+| 1   | Critical donor and auth paths | Defend business-critical anonymous donor access and session guard behavior first.    | #1, #4        | integration + focused e2e smoke              | not started | —                               |
+| 2   | Isolation and data integrity  | Protect cross-shelter isolation and migration/data safety before more feature work.  | #3, #5, #6    | integration + migration smoke                | not started | —                               |
+| 3   | Ordering and UI confidence    | Lock urgency ordering behavior and selective visual confidence on key donor screens. | #2, #1        | unit + integration + selective visual review | not started | —                               |
+| 4   | Shelter account CRUD          | Protect shelter update/delete actions against IDOR and bad-password bypass.          | #7            | unit (action-level)                          | done        | `tests/shelter-actions.test.ts` |
+| 5   | Quality-gates wiring          | Wire and enforce the minimum CI floor for future regressions.                        | cross-cutting | lint/type/test gates                         | not started | —                               |
 
 ## 4. Stack
 
@@ -84,11 +87,23 @@ Top failure scenarios, ordered by risk = impact × likelihood.
 
 ### 6.1 Adding a unit test
 
-- TBD - see §3 Phase 3.
+Pattern established in `tests/shelter-actions.test.ts`:
+
+1. Set up all module mocks with `mock.module()` in `beforeEach` — reset with `mockFn.mockReset()` at the top.
+2. Provide defaults (logged-in session, valid shelter row) so each `it` only overrides what it needs.
+3. Simulate Next.js `redirect()` by throwing `new Error("NEXT_REDIRECT:<path>")` and asserting `rejects.toThrow()`.
+4. For void server actions that can't return errors, assert the redirect target path carries an error query param.
+5. Assert calls on mock functions (`toHaveBeenCalledWith`) rather than peeking at internal state.
 
 ### 6.2 Adding an integration test
 
-- TBD - see §3 Phase 1.
+Pattern established in `tests/integration/donor-flow/`:
+
+1. Gate the `describe` block behind `process.env['RUN_INTEGRATION_TESTS'] === '1'` using `describe.skip` otherwise.
+2. Mock all infra boundaries (`@/db/client`, `@/db/queries/*`, `next/cache`, `next/link`, `next/navigation`) in `beforeEach`.
+3. Import the page/route module **after** mocks are set up via `await import()`.
+4. Use `renderToStaticMarkup()` to produce HTML strings and assert with `.toContain()` — no DOM needed.
+5. Fixtures live in `tests/integration/donor-flow/support/fixtures.ts`; use `DonorFixtureSeedWithNeeds` for tests that need shelter + needs together.
 
 ### 6.3 Adding an e2e test
 
@@ -112,7 +127,7 @@ Top failure scenarios, ordered by risk = impact × likelihood.
 
 ## 8. Freshness Ledger
 
-- Strategy (§1-§5) last reviewed: 2026-06-01
+- Strategy (§1-§5) last reviewed: 2026-06-08
 - Stack versions last verified: 2026-06-01
 - AI-native tool references last verified: 2026-06-01
 

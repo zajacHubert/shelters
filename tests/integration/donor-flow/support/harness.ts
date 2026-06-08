@@ -12,6 +12,21 @@ export interface DonorFixtureSeed {
   }>;
 }
 
+export interface DonorFixtureSeedWithNeeds extends DonorFixtureSeed {
+  shelters: Array<{
+    id: string;
+    name: string;
+    city: string;
+    needs?: Array<{
+      id: number;
+      name: string;
+      urgency: 'pilne' | 'potrzebne' | 'mile_widziane';
+      quantity: number;
+      allegro_link: string | null;
+    }>;
+  }>;
+}
+
 export interface DonorHttpResult {
   status: number;
   body: string;

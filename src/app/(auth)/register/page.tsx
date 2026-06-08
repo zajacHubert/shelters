@@ -1,5 +1,6 @@
 'use client';
 
+import Link from 'next/link';
 import { useActionState } from 'react';
 import { registerAction } from '@/app/actions/auth';
 
@@ -86,12 +87,12 @@ export default function RegisterPage() {
       </button>
       <p className='text-sm text-center text-gray-600'>
         Masz już konto?{' '}
-        <a
+        <Link
           href='/login'
           className='text-blue-600 underline hover:text-blue-800'
         >
           Zaloguj się
-        </a>
+        </Link>
       </p>
     </form>
   );

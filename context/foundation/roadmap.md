@@ -3,7 +3,7 @@ project: ShelterNeeds
 version: 1
 status: draft
 created: 2026-05-25
-updated: 2026-05-27
+updated: 2026-06-08
 prd_version: 1
 main_goal: speed
 top_blocker: capacity
@@ -26,12 +26,12 @@ Schroniska nie mają prostego kanału do komunikowania aktualnych potrzeb zaopat
 ## At a glance
 
 | ID   | Change ID                      | Outcome (user can …)                                                                                                          | Prerequisites | PRD refs                                                                     | Status |
-| ---- | ------------------------------ | ----------------------------------------------------------------------------------------------------------------------------- | ------------- | ---------------------------------------------------------------------------- | ------ |
+| ---- | ------------------------------ | ----------------------------------------------------------------------------------------------------------------------------- | ------------- | ---------------------------------------------------------------------------- | ------ | --- | ---- | -------------------- | ------------------------------------------------------------------------------------------------------------------- | ---- | -------------- | ---- |
 | F-01 | data-layer-foundation          | (fundament) warstwa danych gotowa: schemat tabel schronisk i potrzeb, migracje, izolacja per schronisko                       | —             | NFR (izolacja per schronisko, hasła nie w plaintext)                         | done   |
 | F-02 | auth-scaffold                  | (fundament) autentykacja e-mail+hasło działa: rejestracja z hashowaniem hasła, sesja, ochrona tras panelu koordynatora        | F-01          | FR-001, FR-002, FR-003, NFR (hasła nie w plaintext, izolacja per schronisko) | done   |
 | S-01 | shelter-registration-and-login | koordynator rejestruje schronisko i loguje się do panelu                                                                      | F-01, F-02    | FR-001, FR-002, FR-003, US-01                                                | done   |
 | S-02 | needs-management-panel         | koordynator dodaje, edytuje i usuwa pozycje potrzeb z polami: nazwa, pilność, ilość, link do Allegro                          | S-01          | FR-004, FR-005, FR-006, US-01                                                | done   |
-| S-03 | donor-discovery-flow           | darczyńca przegląda schroniska po mieście, widzi potrzeby posortowane według pilności i klika link do Allegro — bez logowania | F-01          | FR-007, FR-008, FR-009, US-01                                                | done   |
+| S-03 | donor-discovery-flow           | darczyńca przegląda schroniska po mieście, widzi potrzeby posortowane według pilności i klika link do Allegro — bez logowania | F-01          | FR-007, FR-008, FR-009, US-01                                                | done   |     | S-04 | shelter-account-crud | koordynator edytuje dane schroniska (nazwa, miasto, e-mail, hasło) i może usunąć konto wraz z wszystkimi potrzebami | S-01 | FR-010, FR-011 | done |
 
 ## Streams
 
@@ -108,6 +108,18 @@ Fundament poniżej zakłada, że te warstwy są obecne i ich NIE przebudowuje.
 - **Risk:** Pole pilności jest subiektywne i ustawiane przez koordynatora (PRD §Business Logic — świadoma decyzja projektowa); prawidłowe sortowanie w S-03 zależy od dyscypliny koordynatora, nie od walidacji aplikacji.
 - **Status:** done
 
+### S-04: Zarządzanie kontem schroniska (shelter CRUD)
+
+- **Outcome:** koordynator może edytować dane schroniska (nazwa, miasto, adres e-mail, hasło) z potwierdzeniem aktualnym hasłem; może również usunąć konto schroniska wraz ze wszystkimi powiązanymi potrzebami (kaskadowo), co kończy sesję i przekierowuje na stronę główną.
+- **Change ID:** shelter-account-crud
+- **PRD refs:** FR-010, FR-011
+- **Prerequisites:** S-01
+- **Parallel with:** —
+- **Blockers:** —
+- **Unknowns:** —
+- **Risk:** Zmiana e-maila w profilu zmienia login — właściwe wymuszenie potwierdzenia aktualnym hasłem zapobiega przejęciu konta przez błędne wpisanie adresu; usunięcie konta bez potwierdzenia to destrukcyjna operacja nieodwracalna — dlatego oba działania wymagają hasła.
+- **Status:** done
+
 ### S-03: Widok publiczny dla darczyńcy
 
 - **Outcome:** darczyńca może przeglądać listę schronisk filtrowaną po mieście (bez logowania), wejść na stronę schroniska, zobaczyć potrzeby posortowane według pilności (pilne → potrzebne → mile widziane) i kliknąć "Kup na Allegro →" otwierający Allegro w nowej karcie.
@@ -124,12 +136,12 @@ Fundament poniżej zakłada, że te warstwy są obecne i ich NIE przebudowuje.
 ## Backlog Handoff
 
 | Roadmap ID | Change ID                      | Suggested issue title                                                                                  | Ready for `/10x-plan` | Notes                                              |
-| ---------- | ------------------------------ | ------------------------------------------------------------------------------------------------------ | --------------------- | -------------------------------------------------- |
+| ---------- | ------------------------------ | ------------------------------------------------------------------------------------------------------ | --------------------- | -------------------------------------------------- | --- | ---- | -------------------- | -------------------------------------------------------------------------------------- | --- | ---------------- |
 | F-01       | data-layer-foundation          | Warstwa danych: schemat schronisk i potrzeb, migracje, izolacja per schronisko (Workers-compatible DB) | yes                   | Uruchom `/10x-plan data-layer-foundation`          |
 | F-02       | auth-scaffold                  | Szkielet auth: rejestracja, logowanie, sesja, ochrona tras (e-mail+hasło, Next.js + Workers)           | no                    | Poczekaj na F-01                                   |
 | S-01       | shelter-registration-and-login | Koordynator: rejestracja schroniska, logowanie, wylogowanie                                            | no                    | Poczekaj na F-01, F-02                             |
 | S-02       | needs-management-panel         | Koordynator: dodaj / edytuj / usuń potrzebę (nazwa, pilność, ilość, link do Allegro)                   | no                    | Poczekaj na S-01                                   |
-| S-03       | donor-discovery-flow           | Darczyńca: lista schronisk po mieście, potrzeby według pilności, klik Allegro                          | no                    | Poczekaj na F-01; może biec równolegle z S-01/S-02 |
+| S-03       | donor-discovery-flow           | Darczyńca: lista schronisk po mieście, potrzeby według pilności, klik Allegro                          | no                    | Poczekaj na F-01; może biec równolegle z S-01/S-02 |     | S-04 | shelter-account-crud | Koordynator: edycja danych schroniska (nazwa, miasto, e-mail, hasło) + usunięcie konta | yes | Poczekaj na S-01 |
 
 ## Open Roadmap Questions
 
@@ -151,4 +163,4 @@ _(Brak otwartych pytań na poziomie roadmapy. PRD miał 0 otwartych pytań; decy
 - **F-02: (fundament) autentykacja e-mail+hasło działa: rejestracja z hashowaniem hasła, logowanie, zarządzanie sesją, ochrona tras panelu koordynatora — izolacja per schronisko wyegzekwowana przez middleware sesji.** — Archived 2026-05-27 → `context/archive/2026-05-26-auth-scaffold/`. Lesson: —.
 - **S-01: koordynator może zarejestrować schronisko podając nazwę, miasto, e-mail i hasło; zalogować się do panelu; i wylogować.** — Archived 2026-05-27 → `context/archive/2026-05-26-shelter-registration-and-login/`. Lesson: —.
 - **S-02: koordynator może dodać pozycję potrzeby (nazwa, status pilności: pilne/potrzebne/mile widziane, potrzebna ilość, opcjonalny link do Allegro), edytować istniejącą pozycję i usunąć ją.** — Archived 2026-05-27 → `context/archive/2026-05-26-needs-management-panel/`. Lesson: —.
-- **S-03: darczyńca może przeglądać listę schronisk filtrowaną po mieście (bez logowania), wejść na stronę schroniska, zobaczyć potrzeby posortowane według pilności (pilne → potrzebne → mile widziane) i kliknąć "Kup na Allegro →" otwierający Allegro w nowej karcie.** — Archived 2026-05-27 → `context/archive/2026-05-27-donor-discovery-flow/`. Lesson: —.
+- **S-03: darczyńca może przeglądać listę schronisk filtrowaną po mieście (bez logowania), wejść na stronę schroniska, zobaczyć potrzeby posortowane według pilności (pilne → potrzebne → mile widziane) i kliknąć "Kup na Allegro →" otwierający Allegro w nowej karcie.** — Archived 2026-05-27 → `context/archive/2026-05-27-donor-discovery-flow/`. Lesson: —.- **S-04: koordynator może edytować dane schroniska (nazwa, miasto, e-mail, hasło) z potwierdzeniem aktualnym hasłem i usunąć konto wraz ze wszystkimi powiązanymi potrzebami.** — Done 2026-06-08. Files: `src/db/queries/shelters.ts` (`updateShelter`, `deleteShelter`), `src/app/actions/auth.ts` (`updateShelterAction`, `deleteShelterAction`), `src/app/dashboard/shelter-settings.tsx`, `tests/shelter-actions.test.ts` (11 testów), `supabase/seed.sql`, `tests/integration/donor-flow/support/fixtures.ts`. Lesson: usunięcie konta wymaga potwierdzenia hasłem — void action nie może zwrócić błędu; redirect z query param (`?delete_error=bad_password`) to najprostszy mechanizm bez dodatkowej warstwy stanu.
